@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Flame, LogOut, Settings, Clock, Map, Trophy, Calendar, Briefcase, TrendingUp, Palmtree } from 'lucide-react';
+import { Menu, X, Flame, LogOut, Settings, Clock, Map, Briefcase, TrendingUp, Palmtree } from 'lucide-react';
 import { User, DashboardData } from '../../types';
 
 interface TopNavProps {
@@ -49,8 +49,8 @@ export function TopNav({ user, dashboardData, logout, onOpenProfile }: TopNavPro
                             key={link.path}
                             to={link.path}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${isActive(link.path)
-                                    ? 'bg-foreground/5 text-foreground'
-                                    : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'
+                                ? 'bg-foreground/5 text-foreground'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'
                                 }`}
                         >
                             <link.icon size={16} className={isActive(link.path) ? 'text-orange-500' : ''} />
@@ -67,8 +67,8 @@ export function TopNav({ user, dashboardData, logout, onOpenProfile }: TopNavPro
                             key={link.path}
                             to={link.path}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${isActive(link.path)
-                                    ? 'bg-purple-500/10 text-purple-600'
-                                    : 'text-muted-foreground hover:text-purple-600 hover:bg-purple-500/10'
+                                ? 'bg-purple-500/10 text-purple-600'
+                                : 'text-muted-foreground hover:text-purple-600 hover:bg-purple-500/10'
                                 }`}
                         >
                             <link.icon size={16} />
@@ -113,8 +113,8 @@ export function TopNav({ user, dashboardData, logout, onOpenProfile }: TopNavPro
                                 to={link.path}
                                 onClick={() => setIsMenuOpen(false)}
                                 className={`flex items-center gap-3 p-3 rounded-xl text-sm font-medium ${isActive(link.path)
-                                        ? 'bg-orange-500/10 text-orange-600'
-                                        : 'text-muted-foreground hover:bg-muted'
+                                    ? 'bg-orange-500/10 text-orange-600'
+                                    : 'text-muted-foreground hover:bg-muted'
                                     }`}
                             >
                                 <link.icon size={18} />
@@ -130,8 +130,8 @@ export function TopNav({ user, dashboardData, logout, onOpenProfile }: TopNavPro
                                         to={link.path}
                                         onClick={() => setIsMenuOpen(false)}
                                         className={`flex items-center gap-3 p-3 rounded-xl text-sm font-medium ${isActive(link.path)
-                                                ? 'bg-purple-500/10 text-purple-600'
-                                                : 'text-muted-foreground hover:bg-muted'
+                                            ? 'bg-purple-500/10 text-purple-600'
+                                            : 'text-muted-foreground hover:bg-muted'
                                             }`}
                                     >
                                         <link.icon size={18} />

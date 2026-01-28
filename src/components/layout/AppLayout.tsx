@@ -3,7 +3,7 @@ import { TopNav } from './TopNav';
 import { DashboardData } from '../../types';
 import { useAuth } from '../AuthProvider';
 import { ProfileModal } from '../dashboard/ProfileModal';
-import { ThumbsUp, Shield, Settings } from 'lucide-react';
+import { ProfileModal } from '../dashboard/ProfileModal';
 
 interface AppLayoutProps {
     children: ReactNode;
@@ -13,12 +13,6 @@ export function AppLayout({ children }: AppLayoutProps) {
     const { user, logout } = useAuth();
     const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
-    const [toast, setToast] = useState<{ id: number, text: string, type: 'success' | 'error' | 'info' } | null>(null);
-
-    const showToast = (text: string, type: 'success' | 'error' | 'info' = 'info') => {
-        setToast({ id: Date.now(), text, type });
-        setTimeout(() => setToast(null), 3000);
-    };
 
     // Fetch dashboard data globally for the layout
     useEffect(() => {
@@ -27,7 +21,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             try {
                 const response = await fetch(`/api/dashboard?userId=${user.id}`);
                 if (response.ok) {
-                    const data = await response.json();
+                    const data = await response.json() as DashboardData;
                     setDashboardData(data);
                 }
             } catch (error) {
@@ -49,7 +43,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 // Refresh data
                 const response = await fetch(`/api/dashboard?userId=${user?.id}`);
                 if (response.ok) {
-                    const newData = await response.json();
+                    const newData = await response.json() as DashboardData;
                     setDashboardData(newData);
                 }
                 return true;
@@ -86,20 +80,6 @@ export function AppLayout({ children }: AppLayoutProps) {
                 />
             )}
 
-            {/* Toast Notification (Global) */}
-            {toast && (
-                <div className="fixed bottom-6 right-6 z-[60] animate-slide-up">
-                    <div className={`px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 font-medium border ${toast.type === 'success' ? 'bg-green-100 border-green-200 text-green-800' :
-                            toast.type === 'error' ? 'bg-red-100 border-red-200 text-red-800' :
-                                'bg-white border-zinc-200 text-zinc-900'
-                        }`}>
-                        {toast.type === 'success' && <ThumbsUp size={18} className="text-green-600" />}
-                        {toast.type === 'error' && <Shield size={18} className="text-red-600" />}
-                        {toast.type === 'info' && <Settings size={18} className="text-zinc-600" />}
-                        {toast.text}
-                    </div>
-                </div>
-            )}
         </div>
     );
 }
