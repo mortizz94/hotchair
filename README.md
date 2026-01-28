@@ -2,18 +2,18 @@
 Distributed Attendance Verification System
 
 ## Stack
-- **Framework**: Next.js 15
+- **Framework**: Vite + React 19
 - **Database**: Cloudflare D1 (SQLite) with Drizzle ORM
-- **Runtime**: Cloudflare Pages / Workers
+- **Runtime**: Cloudflare Pages
 - **Styling**: Tailwind CSS v4
 
 ## Arquitectura del Sistema
 ```mermaid
 graph TD
-    Client[Browser UI] -->|Next.js App Router| Edge[Cloudflare Pages / Edge Runtime]
+    Client[Browser UI] -->|React Router| Edge[Cloudflare Pages / Edge Runtime]
     
     subgraph Edge Layer
-        Actions[Server Actions]
+        API[Cloudflare Functions]
         Auth[Auth Logic]
         IP[IP Geolocation]
     end
@@ -23,12 +23,12 @@ graph TD
         D1 -->|Result| Drizzle
     end
     
-    Edge --> Actions
-    Actions --> Auth
-    Actions --> IP
-    Actions --> Drizzle
+    Edge --> API
+    API --> Auth
+    API --> IP
+    API --> Drizzle
     
-    Client -->|Polls 5s| Actions
+    Client -->|Fetches| API
 ```
 
 ## Setup
@@ -64,12 +64,12 @@ npx wrangler d1 execute hotchair-db --local --command "INSERT INTO users (id, co
 ```bash
 npm run dev
 ```
-Access at [http://localhost:3000](http://localhost:3000).
+Access at [http://localhost:5173](http://localhost:5173).
 
 ## Deployment
 1. Connect repository to Cloudflare Pages.
-2. Build command: `npx @cloudflare/next-on-pages`
-3. Output directory: `.vercel/output/static`
+2. Build command: `npm run build`
+3. Output directory: `dist`
 4. **Crucial**: Go to Settings -> Functions -> D1 Database Bindings and bind `DB` to your `hotchair-db`.
 
 ## Features
