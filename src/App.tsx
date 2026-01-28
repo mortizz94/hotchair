@@ -12,18 +12,28 @@ import Analytics from './pages/Analytics';
 import TimeOff from './pages/TimeOff';
 import OfficeMapPage from './pages/OfficeMapPage';
 
+import { AppLayout } from './components/layout/AppLayout';
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const { user, isLoading } = useAuth();
 
     if (isLoading) {
-        return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>;
+        return (
+            <div className="min-h-screen bg-background flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+        );
     }
 
     if (!user) {
         return <Navigate to="/login" replace />;
     }
 
-    return <>{children}</>;
+    return (
+        <AppLayout>
+            {children}
+        </AppLayout>
+    );
 }
 
 function App() {

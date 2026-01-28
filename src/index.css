@@ -1,104 +1,179 @@
 @import "tailwindcss";
 
 @theme {
-    /* Premium Dark Theme - Deep Blue/Purple Base */
-    --color-background: hsl(248 40% 6%);
-    --color-foreground: hsl(240 5% 96%);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --radius-lg: var(--radius);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-sm: calc(var(--radius) - 4px);
+    --animate-accordion-down: accordion-down 0.2s ease-out;
+    --animate-accordion-up: accordion-up 0.2s ease-out;
+    --animate-fade-in: fade-in 0.5s ease-out;
+    --animate-slide-up: slide-up 0.5s ease-out;
+    --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    --animate-float: float 6s ease-in-out infinite;
 
-    --color-card: hsl(248 35% 10%);
-    --color-card-foreground: hsl(0 0% 98%);
-
-    --color-popover: hsl(248 35% 8%);
-    --color-popover-foreground: hsl(0 0% 98%);
-
-    /* Vibrant Accents */
-    --color-primary: hsl(265 85% 65%); /* Electric Purple */
-    --color-primary-foreground: hsl(0 0% 100%);
-
-    --color-secondary: hsl(310 80% 60%); /* Hot Pink */
-    --color-secondary-foreground: hsl(0 0% 100%);
-
-    --color-muted: hsl(248 20% 15%);
-    --color-muted-foreground: hsl(248 10% 65%);
-
-    --color-accent: hsl(265 85% 65%);
-    --color-accent-foreground: hsl(0 0% 100%);
-
-    --color-destructive: hsl(0 85% 60%);
-    --color-destructive-foreground: hsl(0 0% 98%);
-
-    --color-border: hsl(248 20% 20%);
-    --color-input: hsl(248 20% 20%);
-    --color-ring: hsl(265 85% 65%);
-
-    --radius-lg: 1rem;
-    --radius-md: calc(1rem - 2px);
-    --radius-sm: calc(1rem - 4px);
-
-    --animate-fade-in: fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    --animate-float: float 4s ease-in-out infinite;
-    --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    --animate-bounce-slow: bounce-slow 2s infinite;
-
-    @keyframes fade-in {
+    @keyframes accordion-down {
         from {
-            opacity: 0;
-            transform: translateY(20px);
-            filter: blur(5px);
+            height: 0
         }
 
         to {
-            opacity: 1;
+            height: var(--radix-accordion-content-height)
+        }
+    }
+
+    @keyframes accordion-up {
+        from {
+            height: var(--radix-accordion-content-height)
+        }
+
+        to {
+            height: 0
+        }
+    }
+
+    @keyframes fade-in {
+        from {
+            opacity: 0
+        }
+
+        to {
+            opacity: 1
+        }
+    }
+
+    @keyframes slide-up {
+        from {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        to {
             transform: translateY(0);
-            filter: blur(0);
+            opacity: 1;
         }
     }
 
     @keyframes float {
-        0%, 100% {
+
+        0%,
+        100% {
             transform: translateY(0);
         }
+
         50% {
-            transform: translateY(-8px);
+            transform: translateY(-10px);
         }
     }
+}
 
-     @keyframes bounce-slow {
-        0%, 100% {
-            transform: translateY(-5%);
-            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-        }
-        50% {
-            transform: translateY(0);
-            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-        }
+:root {
+    /* Bento Grid Palette - Light/Soft Dark Hybrid */
+    --background: #f2f4f6;
+    /* Soft gray background */
+    --foreground: #1a1a1a;
+
+    --card: #ffffff;
+    --card-foreground: #1a1a1a;
+
+    --popover: #ffffff;
+    --popover-foreground: #1a1a1a;
+
+    --primary: #2563eb;
+    /* Royal Blue */
+    --primary-foreground: #ffffff;
+
+    --secondary: #e2e8f0;
+    --secondary-foreground: #1e293b;
+
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+
+    --accent: #eff6ff;
+    --accent-foreground: #2563eb;
+
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+
+    --border: #e2e8f0;
+    --input: #e2e8f0;
+    --ring: #2563eb;
+
+    --radius: 1.5rem;
+    /* Rounds 3xl */
+}
+
+/* Dark Mode Overrides (Optional, keeping it clean for now) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background: #0f172a;
+        /* Slate 900 */
+        --foreground: #f8fafc;
+
+        --card: #1e293b;
+        /* Slate 800 */
+        --card-foreground: #f8fafc;
+
+        --popover: #1e293b;
+        --popover-foreground: #f8fafc;
+
+        --primary: #3b82f6;
+        --primary-foreground: #ffffff;
+
+        --secondary: #334155;
+        --secondary-foreground: #f8fafc;
+
+        --muted: #334155;
+        --muted-foreground: #94a3b8;
+
+        --accent: #1e293b;
+        --accent-foreground: #f8fafc;
+
+        --border: #334155;
+        --input: #334155;
     }
 }
 
 @layer base {
+    * {
+        @apply border-border;
+    }
+
     body {
-        @apply bg-background text-foreground antialiased selection:bg-purple-500/30;
+        @apply bg-background text-foreground font-sans antialiased;
     }
 }
 
-@layer utilities {
-    .glass {
-        @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)];
+@layer components {
+
+    /* Bento Card Utility */
+    .bento-card {
+        @apply bg-card text-card-foreground rounded-[2rem] shadow-sm border border-border/50 p-6 transition-all duration-300 hover:shadow-md hover:-translate-y-1 relative overflow-hidden;
     }
 
-    .glass-card {
-        @apply bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl;
+    .bento-icon-bg {
+        @apply w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-colors;
     }
 
-    .glass-strong {
-        @apply bg-black/40 backdrop-blur-3xl border border-white/10;
-    }
-
-    .glass-button {
-        @apply bg-gradient-to-r from-purple-600/80 to-pink-600/80 hover:from-purple-500 hover:to-pink-500 text-white shadow-lg shadow-purple-500/20 transition-all duration-300 border border-white/10 backdrop-blur-sm;
-    }
-
-    .glass-input {
-        @apply bg-black/20 border border-white/10 focus:border-purple-500/50 focus:ring-purple-500/20 backdrop-blur-md transition-all;
+    .glass-panel {
+        @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-white/5;
     }
 }

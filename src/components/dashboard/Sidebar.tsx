@@ -1,143 +1,143 @@
-import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LogOut, Calendar, Trophy, Zap, Clock, Settings, Shield, Flame, Menu, X, Bell, Briefcase, TrendingUp, Palmtree, Map, Home } from 'lucide-react';
+import React from 'react';
+import { LogOut, Calendar, Trophy, Zap, Clock, Settings, Shield, Flame, Briefcase, TrendingUp, Palmtree, Map, Home } from 'lucide-react';
 import { User, DashboardData } from '../../types';
 import { useNotifications } from '../../hooks/useNotifications';
 
-type SidebarProps = {
+interface SidebarProps {
     user: User | null;
     dashboardData: DashboardData | null;
     logout: () => void;
     onOpenRoulette: () => void;
     onOpenProfile: () => void;
-};
+}
 
 export function Sidebar({ user, dashboardData, logout, onOpenRoulette, onOpenProfile }: SidebarProps) {
     const navigate = useNavigate();
     const location = useLocation();
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { permission, requestPermission } = useNotifications();
 
-    const handleCopyAltai = () => {
-        if (dashboardData?.currentUser?.altaiPassword) {
-            navigator.clipboard.writeText(dashboardData.currentUser.altaiPassword);
-            alert('Contraseña copiada al portapapeles');
-        }
-        window.open('https://app.altaiclockin.com/Default.aspx', '_blank');
-    };
+    const isActive = (path: string) => location.pathname === path;
 
-    const toggleMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-
-    const NavItem = ({ icon: Icon, label, onClick, path, activeColor = "text-blue-400" }: any) => {
-        const isActive = path ? location.pathname === path : false;
+    const NavItem = ({ icon: Icon, label, path, onClick, activeColor = 'text-primary' }: any) => {
+        const active = path ? isActive(path) : false;
 
         return (
             <button
                 onClick={() => {
-                    onClick?.();
+                    if (onClick) onClick();
                     if (path) navigate(path);
-                    setIsMobileMenuOpen(false);
                 }}
-                className={`w-full flex items-center justify-between p-3 rounded-lg transition-all text-sm font-medium group relative overflow-hidden
-                    ${isActive ? 'bg-white/10 text-white' : 'text-zinc-400 hover:text-white hover:bg-white/5'}
-                `}
+                className={`w-full flex items-center gap-3 p-3 rounded-2xl transition-all duration-200 font-medium text-sm group ${active
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    }`}
             >
-                <div className="flex items-center gap-3 z-10">
-                    <Icon size={18} className={`transition-transform group-hover:scale-110 ${isActive ? activeColor : 'text-zinc-500 group-hover:text-white'}`} />
-                    <span>{label}</span>
+                <div className={`p-2 rounded-xl transition-colors ${active ? 'bg-primary text-white' : 'bg-transparent group-hover:bg-muted-foreground/10'}`}>
+                    <Icon size={18} className={active ? 'text-white' : activeColor} />
                 </div>
-                {isActive && <div className={`absolute left-0 top-0 bottom-0 w-1 ${activeColor.replace('text-', 'bg-')}`} />}
+                <span>{label}</span>
+                {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />}
             </button>
         );
-    }
+    };
 
     const NavGroup = ({ title, children }: { title: string, children: React.ReactNode }) => (
         <div className="mb-6">
-            <h4 className="px-3 text-xs font-bold text-zinc-600 uppercase tracking-wider mb-2">{title}</h4>
+            <h3 className="px-4 mb-2 text-xs font-bold text-muted-foreground uppercase tracking-wider">{title}</h3>
             <div className="space-y-1">
                 {children}
             </div>
         </div>
     );
 
-    return (
-        <aside className={`w-full md:w-72 bg-black/95 md:bg-black/40 backdrop-blur-xl md:h-screen sticky top-0 md:border-r border-b md:border-b-0 border-white/10 flex-shrink-0 flex flex-col z-50 transition-all duration-300 ${isMobileMenuOpen ? 'h-screen fixed inset-0' : 'h-16 md:h-screen'}`}>
-            {/* Header Mobile */}
-            <div className="flex justify-between items-center p-4 md:p-6 border-b border-white/5 md:border-none">
-                <h1 className="text-2xl font-black tracking-tighter flex items-center gap-2 italic text-white">
-                    Hot<span className="text-orange-500">Chair</span>
-                    <Flame className="text-orange-500 fill-orange-500 animate-pulse-slow" size={20} />
-                </h1>
+    const handleCopyAltai = () => {
+        if (!user?.altaiUser || !user?.altaiPassword) {
+            alert("No tienes credenciales de Altai configuradas en tu perfil.");
+            return;
+        }
 
-                <button onClick={toggleMenu} className="md:hidden text-zinc-400 hover:text-white p-2">
-                    {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        const textToCopy = `Usuario: ${user.altaiUser}\nContraseña: ${user.altaiPassword}`;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert("Credenciales copiadas al portapapeles");
+            window.open('https://altai.holistic.es/altai/jsp/login.jsp', '_blank');
+        });
+    };
+
+    return (
+        <aside className="hidden md:flex flex-col w-72 h-screen max-h-screen border-r border-border bg-card sticky top-0 overflow-hidden">
+            <div className="p-6">
+                <h1 className="text-2xl font-black tracking-tighter flex items-center gap-2 italic text-primary">
+                    Hot<span className="text-foreground">Chair</span>
+                    <Flame className="text-primary fill-primary animate-pulse-slow" size={24} />
+                </h1>
+            </div>
+
+            <div className="flex-1 overflow-y-auto px-4 pb-4">
+                {/* User Card Mini */}
+                <div
+                    onClick={onOpenProfile}
+                    className="mb-8 flex items-center gap-3 p-3 rounded-2xl bg-muted/50 border border-border cursor-pointer hover:shadow-sm transition-all"
+                >
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden">
+                        {user?.avatar ? <img src={user.avatar} className="w-full h-full object-cover" /> : user?.name.substring(0, 2)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold truncate text-foreground">{user?.name}</p>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span className="bg-primary/10 text-primary px-1.5 py-0.5 rounded text-[10px] font-bold">LVL {dashboardData?.currentUser?.level || 1}</span>
+                            <span>•</span>
+                            <span>{dashboardData?.currentUser?.streak || 0} 🔥</span>
+                        </div>
+                    </div>
+                </div>
+
+                <NavGroup title="Mi Espacio">
+                    <NavItem icon={Home} label="Dashboard" path="/" activeColor="text-blue-500" />
+                    <NavItem icon={Clock} label="Fichar" path="/time-tracking" activeColor="text-purple-500" />
+                    <NavItem icon={Palmtree} label="Ausencias" path="/time-off" activeColor="text-green-500" />
+                    <NavItem icon={Calendar} label="Historial" path="/history" activeColor="text-orange-500" />
+                </NavGroup>
+
+                <NavGroup title="Oficina">
+                    <NavItem icon={Map} label="Mapa" path="/map" activeColor="text-blue-500" />
+                    <NavItem icon={Trophy} label="Ranking" path="/leaderboard" activeColor="text-yellow-500" />
+                    <NavItem icon={Zap} label="Ruleta" onClick={onOpenRoulette} activeColor="text-orange-500" />
+                </NavGroup>
+
+                {user?.role === 'admin' && (
+                    <NavGroup title="Admin">
+                        <NavItem icon={Shield} label="Panel" path="/admin" activeColor="text-red-500" />
+                        <NavItem icon={Briefcase} label="Dept." path="/departments" activeColor="text-pink-500" />
+                        <NavItem icon={TrendingUp} label="Datos" path="/analytics" activeColor="text-cyan-500" />
+                    </NavGroup>
+                )}
+            </div>
+
+            <div className="px-4 pb-2">
+                <button
+                    onClick={handleCopyAltai}
+                    className="w-full flex items-center gap-3 p-3 rounded-2xl transition-all duration-200 font-medium text-sm text-muted-foreground hover:bg-muted hover:text-foreground group"
+                >
+                    <div className="p-2 rounded-xl bg-transparent group-hover:bg-muted-foreground/10 transition-colors">
+                        <LogOut size={18} className="text-muted-foreground group-hover:text-foreground rotate-180" />
+                    </div>
+                    <span>Fichar (Altai)</span>
                 </button>
             </div>
 
-            {/* Content */}
-            <div className={`flex-1 flex flex-col overflow-y-auto p-4 transition-all duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'hidden md:flex opacity-100'}`}>
-
-                {/* User Profile Summary */}
-                <div className="mb-8 flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center font-bold text-white uppercase">
-                        {user?.avatar ? <img src={user.avatar} className="w-full h-full rounded-full object-cover" /> : user?.name.substring(0, 2)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-white truncate">{user?.name}</p>
-                        <p className="text-xs text-zinc-500 flex items-center gap-1">
-                            LVL {dashboardData?.currentUser?.level || 1} • {dashboardData?.currentUser?.status === 'present' ? <span className="text-green-500">Online</span> : <span className="text-zinc-500">Offline</span>}
-                        </p>
-                    </div>
-                    <button onClick={onOpenProfile} className="p-1.5 hover:bg-white/10 rounded-lg text-zinc-400 hover:text-white transition-colors">
-                        <Settings size={16} />
-                    </button>
-                </div>
-
-                <div className="flex-1">
-                    <NavGroup title="Mi Espacio">
-                        <NavItem icon={Home} label="Dashboard" path="/" activeColor="text-orange-400" />
-                        <NavItem icon={Clock} label="Registro Horario" path="/time-tracking" activeColor="text-purple-400" />
-                        <NavItem icon={Palmtree} label="Mis Ausencias" path="/time-off" activeColor="text-green-400" />
-                        <NavItem icon={Calendar} label="Historial" path="/history" activeColor="text-blue-400" />
-                    </NavGroup>
-
-                    <NavGroup title="Oficina">
-                        <NavItem icon={Map} label="Mapa Oficina" path="/map" activeColor="text-indigo-400" />
-                        <NavItem icon={Trophy} label="Hall of Fame" path="/leaderboard" activeColor="text-yellow-400" />
-                        <NavItem icon={Zap} label="Silla Caliente" onClick={onOpenRoulette} activeColor="text-orange-500 hover:text-orange-500" />
-                    </NavGroup>
-
-                    {user?.role === 'admin' && (
-                        <NavGroup title="Gestión">
-                            <NavItem icon={Shield} label="Admin Panel" path="/admin" activeColor="text-red-400" />
-                            <NavItem icon={Briefcase} label="Departamentos" path="/departments" activeColor="text-pink-400" />
-                            <NavItem icon={TrendingUp} label="Analytics" path="/analytics" activeColor="text-cyan-400" />
-                        </NavGroup>
-                    )}
-                </div>
-
-                {/* Footer Actions */}
-                <div className="mt-4 pt-4 border-t border-white/5 space-y-1">
-                    <NavItem icon={LogOut} label="Fichar en Altai" onClick={handleCopyAltai} activeColor="text-zinc-400" />
-                    {permission === 'default' && (
-                        <NavItem icon={Bell} label="Activar Alertas" onClick={requestPermission} activeColor="text-yellow-400" />
-                    )}
-                    <button
-                        onClick={logout}
-                        className="w-full flex items-center gap-3 p-3 rounded-lg text-sm font-medium text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                    >
-                        <LogOut size={18} />
-                        <span>Cerrar Sesión</span>
-                    </button>
-                </div>
-
-                <div className="mt-6 text-[10px] text-zinc-700 text-center font-mono">
-                    ID: {user?.code} • v6.6.6
-                </div>
+            <div className="p-4 border-t border-border mt-auto">
+                <button
+                    onClick={logout}
+                    className="w-full flex items-center justify-center gap-2 p-3 rounded-xl text-sm font-bold text-destructive hover:bg-destructive/10 transition-colors"
+                >
+                    <LogOut size={16} />
+                    <span>Salir</span>
+                </button>
+                <p className="text-[10px] text-center text-muted-foreground mt-2 font-mono opacity-50">
+                    v6.6.6 • {user?.code}
+                </p>
             </div>
         </aside>
     );
 }
-
-// Reuse logic from original component for things I missed? 
-// No, rewritten cleanly.
