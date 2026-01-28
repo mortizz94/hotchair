@@ -24,7 +24,7 @@ export default function Dashboard() {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
 
     const { playSuccess } = useSoundEffects();
-    const { requestPermission, sendNotification } = useNotifications();
+    const { sendNotification } = useNotifications();
 
     const showToast = (text: string, type: 'success' | 'error' | 'info' = 'info') => {
         setToast({ id: Date.now(), text, type });
@@ -207,7 +207,6 @@ export default function Dashboard() {
                             <UserCard
                                 key={u.id}
                                 userScore={u}
-                                currentUser={user}
                                 currentUserId={user?.id}
                                 dashboardData={data}
                                 attendance={attendanceMap.get(u.id)}

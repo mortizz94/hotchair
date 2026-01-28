@@ -1,83 +1,104 @@
 @import "tailwindcss";
 
 @theme {
-    --color-background: hsl(240 10% 4%);
-    --color-foreground: hsl(0 0% 98%);
+    /* Premium Dark Theme - Deep Blue/Purple Base */
+    --color-background: hsl(248 40% 6%);
+    --color-foreground: hsl(240 5% 96%);
 
-    --color-card: hsl(240 6% 10%);
+    --color-card: hsl(248 35% 10%);
     --color-card-foreground: hsl(0 0% 98%);
 
-    --color-popover: hsl(240 10% 3.9%);
+    --color-popover: hsl(248 35% 8%);
     --color-popover-foreground: hsl(0 0% 98%);
 
-    --color-primary: hsl(15 90% 50%);
-    --color-primary-foreground: hsl(0 0% 98%);
+    /* Vibrant Accents */
+    --color-primary: hsl(265 85% 65%); /* Electric Purple */
+    --color-primary-foreground: hsl(0 0% 100%);
 
-    --color-secondary: hsl(240 3.7% 15.9%);
-    --color-secondary-foreground: hsl(0 0% 98%);
+    --color-secondary: hsl(310 80% 60%); /* Hot Pink */
+    --color-secondary-foreground: hsl(0 0% 100%);
 
-    --color-muted: hsl(240 3.7% 15.9%);
-    --color-muted-foreground: hsl(240 5% 64.9%);
+    --color-muted: hsl(248 20% 15%);
+    --color-muted-foreground: hsl(248 10% 65%);
 
-    --color-accent: hsl(240 3.7% 15.9%);
-    --color-accent-foreground: hsl(0 0% 98%);
+    --color-accent: hsl(265 85% 65%);
+    --color-accent-foreground: hsl(0 0% 100%);
 
-    --color-destructive: hsl(0 62.8% 30.6%);
+    --color-destructive: hsl(0 85% 60%);
     --color-destructive-foreground: hsl(0 0% 98%);
 
-    --color-border: hsl(240 3.7% 15.9%);
-    --color-input: hsl(240 3.7% 15.9%);
-    --color-ring: hsl(15 90% 50%);
+    --color-border: hsl(248 20% 20%);
+    --color-input: hsl(248 20% 20%);
+    --color-ring: hsl(265 85% 65%);
 
-    --radius-lg: 0.75rem;
-    --radius-md: calc(0.75rem - 2px);
-    --radius-sm: calc(0.75rem - 4px);
+    --radius-lg: 1rem;
+    --radius-md: calc(1rem - 2px);
+    --radius-sm: calc(1rem - 4px);
 
-    --animate-fade-in: fade-in 0.5s ease-out;
-    --animate-float: float 3s ease-in-out infinite;
-    --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    --animate-fade-in: fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    --animate-float: float 4s ease-in-out infinite;
+    --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    --animate-bounce-slow: bounce-slow 2s infinite;
 
     @keyframes fade-in {
         from {
             opacity: 0;
-            transform: translateY(10px);
+            transform: translateY(20px);
+            filter: blur(5px);
         }
 
         to {
             opacity: 1;
             transform: translateY(0);
+            filter: blur(0);
         }
     }
 
     @keyframes float {
-
-        0%,
-        100% {
+        0%, 100% {
             transform: translateY(0);
         }
-
         50% {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+        }
+    }
+
+     @keyframes bounce-slow {
+        0%, 100% {
+            transform: translateY(-5%);
+            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+        }
+        50% {
+            transform: translateY(0);
+            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
         }
     }
 }
 
 @layer base {
     body {
-        @apply bg-background text-foreground antialiased selection:bg-orange-500/30;
+        @apply bg-background text-foreground antialiased selection:bg-purple-500/30;
     }
 }
 
 @layer utilities {
     .glass {
-        @apply bg-white/5 backdrop-blur-lg border border-white/10;
+        @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.36)];
     }
 
     .glass-card {
-        @apply bg-zinc-900/40 backdrop-blur-md border border-white/5 shadow-xl;
+        @apply bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl;
     }
 
     .glass-strong {
-        @apply bg-black/60 backdrop-blur-xl border border-white/10;
+        @apply bg-black/40 backdrop-blur-3xl border border-white/10;
+    }
+
+    .glass-button {
+        @apply bg-gradient-to-r from-purple-600/80 to-pink-600/80 hover:from-purple-500 hover:to-pink-500 text-white shadow-lg shadow-purple-500/20 transition-all duration-300 border border-white/10 backdrop-blur-sm;
+    }
+
+    .glass-input {
+        @apply bg-black/20 border border-white/10 focus:border-purple-500/50 focus:ring-purple-500/20 backdrop-blur-md transition-all;
     }
 }

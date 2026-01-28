@@ -35,3 +35,13 @@ export const allowedIps = sqliteTable('allowed_ips', {
     label: text('label'), // Description e.g. "Madrid Office"
     createdAt: integer('created_at').notNull(),
 });
+
+export const timeEntries = sqliteTable('time_entries', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    userId: text('user_id').notNull().references(() => users.id),
+    date: text('date').notNull(), // YYYY-MM-DD
+    startTime: integer('start_time').notNull(), // Timestamp
+    endTime: integer('end_time'), // Timestamp, null if currently active
+    description: text('description'),
+    projectId: text('project_id'),
+});

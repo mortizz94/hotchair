@@ -5,11 +5,14 @@ export type User = {
     role: 'admin' | 'user';
     altaiUser?: string;
     altaiPassword?: string;
+    avatar?: string;
     // Gamification
     badges?: string[];
     level?: number;
     xp?: number;
     streak?: number;
+    // Dynamic
+    status?: 'present' | 'absent';
 };
 
 export type Attendance = {

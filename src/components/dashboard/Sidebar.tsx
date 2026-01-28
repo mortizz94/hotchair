@@ -126,10 +126,18 @@ export function Sidebar({ user, dashboardData, logout, onOpenRoulette, onOpenPro
                     </button>
 
                     <button
+                        onClick={() => navigate('/time-tracking')}
+                        className="w-full flex items-center gap-4 py-3.5 px-5 rounded-xl bg-white/5 hover:bg-white/10 transition-all text-sm font-semibold border border-transparent hover:border-white/5 group"
+                    >
+                        <Clock size={18} className="text-purple-400 group-hover:scale-110 transition-transform" />
+                        <span className="text-zinc-300 group-hover:text-white">Registro Horario</span>
+                    </button>
+
+                    <button
                         onClick={handleCopyAltai}
                         className="w-full flex items-center gap-4 py-3.5 px-5 rounded-xl bg-white/5 hover:bg-white/10 transition-all text-sm font-semibold border border-transparent hover:border-white/5 group"
                     >
-                        <Clock size={18} className="text-green-400 group-hover:scale-110 transition-transform" />
+                        <LogOut size={18} className="text-green-400 group-hover:scale-110 transition-transform" />
                         <span className="text-zinc-300 group-hover:text-white">Fichar (Altai)</span>
                     </button>
 

@@ -6,6 +6,7 @@ import Admin from './pages/Admin';
 import History from './pages/History';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Leaderboard from './pages/Leaderboard';
+import TimeTracking from './pages/TimeTracking';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const { user, isLoading } = useAuth();
@@ -57,6 +58,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <Leaderboard />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/time-tracking"
+                        element={
+                            <ProtectedRoute>
+                                <TimeTracking />
                             </ProtectedRoute>
                         }
                     />
