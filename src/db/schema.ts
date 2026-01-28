@@ -6,6 +6,7 @@ export const departments = sqliteTable('departments', {
     name: text('name').notNull().unique(),
     color: text('color').notNull(), // Hex code or Tailwind class
     icon: text('icon'), // Lucide icon name
+    managerId: text('manager_id'), // User ID of the manager
 });
 
 export const users = sqliteTable('users', {
@@ -25,6 +26,8 @@ export const attendance = sqliteTable('attendance', {
     userId: text('user_id').notNull().references(() => users.id),
     date: text('date').notNull(), // YYYY-MM-DD
     isPresent: integer('is_present', { mode: 'boolean' }).notNull(),
+    // Let's stick to existing column name isPresent but add location
+    location: text('location').default('office'), // 'office' | 'remote'
     seatId: integer('seat_id'), // 1-20
     timestamp: integer('timestamp').notNull(), // Created at
 });
