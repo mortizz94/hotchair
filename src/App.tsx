@@ -7,6 +7,10 @@ import History from './pages/History';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Leaderboard from './pages/Leaderboard';
 import TimeTracking from './pages/TimeTracking';
+import Departments from './pages/Departments';
+import Analytics from './pages/Analytics';
+import TimeOff from './pages/TimeOff';
+import OfficeMapPage from './pages/OfficeMapPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const { user, isLoading } = useAuth();
@@ -62,10 +66,42 @@ function App() {
                         }
                     />
                     <Route
+                        path="/departments"
+                        element={
+                            <ProtectedRoute>
+                                <Departments />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
                         path="/time-tracking"
                         element={
                             <ProtectedRoute>
                                 <TimeTracking />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/analytics"
+                        element={
+                            <ProtectedRoute>
+                                <Analytics />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/time-off"
+                        element={
+                            <ProtectedRoute>
+                                <TimeOff />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/map"
+                        element={
+                            <ProtectedRoute>
+                                <OfficeMapPage />
                             </ProtectedRoute>
                         }
                     />

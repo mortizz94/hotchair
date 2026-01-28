@@ -5,13 +5,15 @@ import { eq } from 'drizzle-orm';
 export const onRequestPut = async (context: any) => {
     try {
         const db = getDb(context);
-        const { userId, newPin, altaiUser, altaiPassword } = await context.request.json();
+        const { userId, newPin, altaiUser, altaiPassword, departmentId } = await context.request.json();
 
         // Update object construction
         const updateData: any = {};
         if (newPin) updateData.pin = newPin;
         if (altaiUser !== undefined) updateData.altaiUser = altaiUser;
+        if (altaiUser !== undefined) updateData.altaiUser = altaiUser;
         if (altaiPassword !== undefined) updateData.altaiPassword = altaiPassword;
+        if (departmentId !== undefined) updateData.departmentId = departmentId;
 
         if (Object.keys(updateData).length === 0) {
             return new Response(JSON.stringify({ error: 'No hay datos para actualizar' }), { status: 400 });

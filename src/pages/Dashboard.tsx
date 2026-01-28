@@ -129,7 +129,7 @@ export default function Dashboard() {
         }
     };
 
-    const handleUpdateProfile = async (profileData: { userId: string, newPin?: string, altaiUser?: string, altaiPassword?: string }) => {
+    const handleUpdateProfile = async (profileData: { userId: string, newPin?: string, altaiUser?: string, altaiPassword?: string, departmentId?: number }) => {
         try {
             const res = await fetch('/api/profile', {
                 method: 'PUT',

@@ -1,4 +1,12 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { sql } from 'drizzle-orm';
+
+export const departments = sqliteTable('departments', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    name: text('name').notNull().unique(),
+    color: text('color').notNull(), // Hex code or Tailwind class
+    icon: text('icon'), // Lucide icon name
+});
 
 export const users = sqliteTable('users', {
     id: text('id').primaryKey(), // UUID
@@ -7,6 +15,7 @@ export const users = sqliteTable('users', {
     name: text('name').notNull(),
     avatar: text('avatar'), // Avatar URL or placeholder
     role: text('role').$type<'admin' | 'user'>().default('user'),
+    departmentId: integer('department_id').references(() => departments.id),
     altaiUser: text('altai_user'),
     altaiPassword: text('altai_password'),
 });
@@ -44,4 +53,25 @@ export const timeEntries = sqliteTable('time_entries', {
     endTime: integer('end_time'), // Timestamp, null if currently active
     description: text('description'),
     projectId: text('project_id'),
+});
+
+export const timeOffRequests = sqliteTable('time_off_requests', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    userId: text('user_id').notNull().references(() => users.id),
+    startDate: text('start_date').notNull(), // YYYY-MM-DD
+    endDate: text('end_date').notNull(), // YYYY-MM-DD
+    type: text('type').notNull(), // vacation, sick, personal
+    reason: text('reason'),
+    status: text('status').default('pending'), // pending, approved, rejected
+    createdAt: integer('created_at').notNull().default(sql`(strftime('%s', 'now'))`)
+});
+
+export const seats = sqliteTable('seats', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    name: text('name').notNull(),
+    x: integer('x').notNull(),
+    y: integer('y').notNull(),
+    type: text('type').default('desk'), // desk, meeting_room, common
+    status: text('status').default('available'), // available, occupied
+    assignedUserId: text('assigned_user_id'), // if permanently assigned
 });

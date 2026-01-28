@@ -1,0 +1,1 @@
+ALTER TABLE `attendance` ADD `seat_id` integer;

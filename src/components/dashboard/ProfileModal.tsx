@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { X, Settings } from 'lucide-react';
-import { User } from '../../types';
+import { X, Settings, Briefcase } from 'lucide-react';
+import { User, Department } from '../../types';
 
 interface ProfileModalProps {
     isOpen: boolean;
@@ -8,7 +8,7 @@ interface ProfileModalProps {
     currentUser: User | null;
     currentAltaiUser?: string;
     currentAltaiPassword?: string;
-    onUpdateProfile: (data: { userId: string, newPin?: string, altaiUser?: string, altaiPassword?: string }) => Promise<boolean>;
+    onUpdateProfile: (data: { userId: string, newPin?: string, altaiUser?: string, altaiPassword?: string, departmentId?: number }) => Promise<boolean>;
 }
 
 export function ProfileModal({ isOpen, onClose, currentUser, currentAltaiUser, currentAltaiPassword, onUpdateProfile }: ProfileModalProps) {
@@ -16,6 +16,9 @@ export function ProfileModal({ isOpen, onClose, currentUser, currentAltaiUser, c
     const [confirmPin, setConfirmPin] = useState('');
     const [altaiUser, setAltaiUser] = useState('');
     const [altaiPassword, setAltaiPassword] = useState('');
+    const [departmentId, setDepartmentId] = useState<number | undefined>(currentUser?.departmentId);
+    const [departments, setDepartments] = useState<Department[]>([]);
+
     const [profileMessage, setProfileMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -23,11 +26,17 @@ export function ProfileModal({ isOpen, onClose, currentUser, currentAltaiUser, c
         if (isOpen) {
             setAltaiUser(currentAltaiUser || '');
             setAltaiPassword(currentAltaiPassword || '');
+            setDepartmentId(currentUser?.departmentId);
             setNewPin('');
             setConfirmPin('');
             setProfileMessage(null);
+
+            fetch('/api/departments')
+                .then(res => res.json())
+                .then(data => setDepartments(data as Department[]))
+                .catch(console.error);
         }
-    }, [isOpen, currentAltaiUser, currentAltaiPassword]);
+    }, [isOpen, currentAltaiUser, currentAltaiPassword, currentUser]);
 
     if (!isOpen) return null;
 
@@ -53,7 +62,8 @@ export function ProfileModal({ isOpen, onClose, currentUser, currentAltaiUser, c
                 userId: currentUser.id,
                 newPin: newPin || undefined,
                 altaiUser,
-                altaiPassword
+                altaiPassword,
+                departmentId
             });
 
             if (success) {
@@ -115,6 +125,23 @@ export function ProfileModal({ isOpen, onClose, currentUser, currentAltaiUser, c
                             placeholder="••••"
                             maxLength={4}
                         />
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Departamento</label>
+                        <div className="relative">
+                            <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
+                            <select
+                                value={departmentId || ''}
+                                onChange={(e) => setDepartmentId(e.target.value ? Number(e.target.value) : undefined)}
+                                className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 pl-10 text-white outline-none focus:ring-2 focus:ring-orange-500 transition-colors appearance-none"
+                            >
+                                <option value="">Sin departamento</option>
+                                {departments.map(dept => (
+                                    <option key={dept.id} value={dept.id}>{dept.name}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                     <div className="space-y-4 pt-4 border-t border-zinc-700">
                         <h4 className="text-zinc-300 font-bold text-sm uppercase tracking-wide">Credenciales Altai</h4>

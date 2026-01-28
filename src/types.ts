@@ -6,6 +6,7 @@ export type User = {
     altaiUser?: string;
     altaiPassword?: string;
     avatar?: string;
+    departmentId?: number; // Added departmentId
     // Gamification
     badges?: string[];
     level?: number;
@@ -15,10 +16,28 @@ export type User = {
     status?: 'present' | 'absent';
 };
 
+export type Department = {
+    id: number;
+    name: string;
+    color: string;
+    icon?: string;
+};
+
+export type Seat = {
+    id: number;
+    name: string;
+    x: number;
+    y: number;
+    type: string;
+    status: string;
+    assignedUserId?: string;
+};
+
 export type Attendance = {
     userId: string;
     isPresent: boolean;
     date: string;
+    seatId?: number;
 };
 
 export type Vote = {

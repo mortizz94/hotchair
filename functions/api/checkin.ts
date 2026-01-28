@@ -33,7 +33,7 @@ export const onRequestPost = async (context: any) => {
 
         if (existing) {
             await db.update(attendance)
-                .set({ isPresent, seatId, timestamp: Date.now() })
+                .set({ isPresent, seatId: isPresent ? seatId : null, timestamp: Date.now() })
                 .where(eq(attendance.id, existing.id));
         } else {
             await db.insert(attendance).values({
