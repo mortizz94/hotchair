@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../components/AuthProvider';
-import { Calendar, Save, CheckCircle, XCircle } from 'lucide-react';
+import { Calendar, Save, CheckCircle, XCircle, Users, Clock } from 'lucide-react';
 
 interface TimeOffRequest {
     id: number;
     userId: string;
     userName?: string;
+    userAvatar?: string;
     startDate: string;
     endDate: string;
     type: string;
@@ -16,9 +17,11 @@ interface TimeOffRequest {
 
 export default function TimeOff() {
     const { user } = useAuth();
-    const [requests, setRequests] = useState<TimeOffRequest[]>([]);
+    const [myRequests, setMyRequests] = useState<TimeOffRequest[]>([]);
+    const [managedRequests, setManagedRequests] = useState<TimeOffRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [isCreating, setIsCreating] = useState(false);
+    const [viewMode, setViewMode] = useState<'mine' | 'team'>('mine');
 
     // Form
     const [startDate, setStartDate] = useState('');
@@ -27,17 +30,26 @@ export default function TimeOff() {
     const [reason, setReason] = useState('');
 
     useEffect(() => {
-        if (user) fetchRequests();
+        if (user) fetchAllData();
     }, [user]);
 
-    const fetchRequests = async () => {
+    const fetchAllData = async () => {
         setLoading(true);
         try {
-            const query = user?.role === 'admin' ? '' : `?userId=${user?.id}`;
-            const res = await fetch(`/api/time-off${query}`);
-            if (res.ok) {
-                const data = await res.json() as TimeOffRequest[];
-                setRequests(data);
+            // 1. Fetch My Requests
+            const myRes = await fetch(`/api/time-off?userId=${user?.id}`);
+            if (myRes.ok) {
+                setMyRequests(await myRes.json());
+            }
+
+            // 2. Fetch Team Requests (if I am a manager)
+            // If admin, this logic might differ (admins might use query params differently or see all)
+            // But let's check for manager role specifically via this endpoint
+            const teamRes = await fetch(`/api/time-off?managerId=${user?.id}`);
+            if (teamRes.ok) {
+                const teamData = await teamRes.json();
+                setManagedRequests(teamData);
+                // Auto-switch to team view if there are pending requests and I have no pending requests? No, stick to 'mine' default.
             }
         } catch (e) {
             console.error(e);
@@ -69,7 +81,7 @@ export default function TimeOff() {
                 setEndDate('');
                 setType('vacation');
                 setReason('');
-                fetchRequests();
+                fetchAllData(); // Refresh
             }
         } catch (e) {
             console.error(e);
@@ -83,7 +95,7 @@ export default function TimeOff() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, status })
             });
-            fetchRequests();
+            fetchAllData();
         } catch (e) {
             console.error(e);
         }
@@ -106,21 +118,48 @@ export default function TimeOff() {
         }
     };
 
+    const isManagerOrAdmin = user?.role === 'admin' || managedRequests.length > 0;
+
     return (
-        <div className="p-6 md:p-10 max-w-5xl mx-auto min-h-screen animate-fade-in">
-            <header className="flex justify-between items-center mb-10">
+        <div className="p-4 md:p-10 max-w-5xl mx-auto min-h-screen animate-fade-in">
+            <header className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
-                        <Calendar className="text-orange-400" /> Mis Ausencias
+                        <Calendar className="text-orange-400" /> Gestión de Ausencias
                     </h1>
                     <p className="text-zinc-400">Gestiona tus vacaciones y días libres</p>
                 </div>
-                <button
-                    onClick={() => setIsCreating(!isCreating)}
-                    className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-bold transition-colors"
-                >
-                    {isCreating ? 'Cancelar' : 'Solicitar Ausencia'}
-                </button>
+
+                <div className="flex gap-3">
+                    {isManagerOrAdmin && (
+                        <div className="flex bg-zinc-800 p-1 rounded-xl items-center">
+                            <button
+                                onClick={() => setViewMode('mine')}
+                                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${viewMode === 'mine' ? 'bg-zinc-700 text-white shadow-md' : 'text-zinc-400 hover:text-white'}`}
+                            >
+                                Mis Solicitudes
+                            </button>
+                            <button
+                                onClick={() => setViewMode('team')}
+                                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 ${viewMode === 'team' ? 'bg-zinc-700 text-white shadow-md' : 'text-zinc-400 hover:text-white'}`}
+                            >
+                                Equipo
+                                {managedRequests.filter(r => r.status === 'pending').length > 0 && (
+                                    <span className="bg-orange-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                                        {managedRequests.filter(r => r.status === 'pending').length}
+                                    </span>
+                                )}
+                            </button>
+                        </div>
+                    )}
+
+                    <button
+                        onClick={() => setIsCreating(!isCreating)}
+                        className="flex items-center gap-2 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-bold transition-colors"
+                    >
+                        {isCreating ? 'Cancelar' : 'Solicitar'}
+                    </button>
+                </div>
             </header>
 
             {isCreating && (
@@ -182,43 +221,56 @@ export default function TimeOff() {
             <div className="space-y-4">
                 {loading ? (
                     <div className="text-center text-white">Cargando solicitudes...</div>
-                ) : requests.length === 0 ? (
-                    <div className="text-center text-zinc-500 py-10">No tienes solicitudes registradas.</div>
+                ) : (viewMode === 'mine' ? myRequests : managedRequests).length === 0 ? (
+                    <div className="text-center text-zinc-500 py-10">
+                        {viewMode === 'mine' ? 'No tienes solicitudes registradas.' : 'No hay solicitudes de tu equipo.'}
+                    </div>
                 ) : (
-                    requests.map((req) => (
+                    (viewMode === 'mine' ? myRequests : managedRequests).map((req) => (
                         <div key={req.id} className="glass p-5 rounded-xl flex flex-col md:flex-row justify-between items-center gap-4 hover:bg-white/5 transition-colors border-l-4 border-l-transparent hover:border-l-orange-500">
-                            <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-1">
+                            <div className="flex-1 w-full">
+                                <div className="flex items-center gap-3 mb-2">
+                                    {/* User Info if Team View */}
+                                    {viewMode === 'team' && (
+                                        <div className="flex items-center gap-2 mr-2 bg-white/5 pr-3 py-1 rounded-full">
+                                            <div className="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs font-bold">
+                                                {req.userAvatar ? <img src={req.userAvatar} className="w-full h-full object-cover rounded-full" /> : req.userName?.substring(0, 1)}
+                                            </div>
+                                            <span className="text-sm font-bold text-white">{req.userName}</span>
+                                        </div>
+                                    )}
+
                                     <span className={`text-xs font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${getStatusColor(req.status)}`}>
                                         {req.status === 'pending' ? 'Pendiente' : req.status === 'approved' ? 'Aprobada' : 'Rechazada'}
                                     </span>
-                                    <h4 className="text-white font-bold text-lg">{getTypeLabel(req.type)}</h4>
                                 </div>
-                                <p className="text-zinc-400 text-sm flex items-center gap-2">
-                                    <Calendar size={14} />
-                                    {new Date(req.startDate).toLocaleDateString()} - {new Date(req.endDate).toLocaleDateString()}
-                                    {req.reason && <span className="text-zinc-500 italic"> • "{req.reason}"</span>}
-                                </p>
-                                {user?.role === 'admin' && req.userName && (
-                                    <p className="text-xs text-blue-400 mt-1">Solicitado por: {req.userName}</p>
-                                )}
+
+                                <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6">
+                                    <h4 className="text-white font-bold text-lg">{getTypeLabel(req.type)}</h4>
+                                    <p className="text-zinc-400 text-sm flex items-center gap-2">
+                                        <Clock size={14} />
+                                        {new Date(req.startDate).toLocaleDateString()} - {new Date(req.endDate).toLocaleDateString()}
+                                    </p>
+                                    {req.reason && <p className="text-zinc-500 text-sm italic">"{req.reason}"</p>}
+                                </div>
                             </div>
 
-                            {user?.role === 'admin' && req.status === 'pending' && (
-                                <div className="flex gap-2">
+                            {/* Actions for Manager/Admin in Team View */}
+                            {viewMode === 'team' && req.status === 'pending' && (
+                                <div className="flex gap-2 w-full md:w-auto justify-end">
                                     <button
                                         onClick={() => handleStatusUpdate(req.id, 'approved')}
-                                        className="p-2 bg-green-500/20 text-green-400 hover:bg-green-500/30 rounded-lg transition-colors"
+                                        className="p-2 bg-green-500/20 text-green-400 hover:bg-green-500/30 rounded-lg transition-colors flex items-center gap-2"
                                         title="Aprobar"
                                     >
-                                        <CheckCircle size={20} />
+                                        <CheckCircle size={20} /> <span className="md:hidden">Aprobar</span>
                                     </button>
                                     <button
                                         onClick={() => handleStatusUpdate(req.id, 'rejected')}
-                                        className="p-2 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg transition-colors"
+                                        className="p-2 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg transition-colors flex items-center gap-2"
                                         title="Rechazar"
                                     >
-                                        <XCircle size={20} />
+                                        <XCircle size={20} /> <span className="md:hidden">Rechazar</span>
                                     </button>
                                 </div>
                             )}

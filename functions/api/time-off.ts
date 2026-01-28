@@ -1,30 +1,62 @@
 import { getDb } from '../utils/db';
-import { timeOffRequests, users } from '../../src/db/schema';
-import { eq, desc, and } from 'drizzle-orm';
+import { timeOffRequests, users, departments } from '../../src/db/schema';
+import { eq, desc, inArray } from 'drizzle-orm';
 
 export const onRequestGet = async (context: any) => {
     const db = getDb(context);
     const url = new URL(context.request.url);
     const userId = url.searchParams.get('userId');
+    const managerId = url.searchParams.get('managerId');
 
     try {
-        let query = db.select({
+        // Base Query Columns
+        const selectFields = {
             id: timeOffRequests.id,
             userId: timeOffRequests.userId,
             userName: users.name,
+            userAvatar: users.avatar,
             startDate: timeOffRequests.startDate,
             endDate: timeOffRequests.endDate,
             type: timeOffRequests.type,
             reason: timeOffRequests.reason,
             status: timeOffRequests.status,
             createdAt: timeOffRequests.createdAt
-        })
+        };
+
+        if (managerId) {
+            // 1. Get departments managed by this user
+            const managedDepartments = await db.select({ id: departments.id })
+                .from(departments)
+                .where(eq(departments.managerId, managerId))
+                .all();
+
+            const deptIds = managedDepartments.map((d: any) => d.id);
+
+            if (deptIds.length === 0) {
+                return new Response(JSON.stringify([]), { headers: { 'Content-Type': 'application/json' } });
+            }
+
+            // 2. Get requests from users in these departments
+            const entries = await db.select(selectFields)
+                .from(timeOffRequests)
+                .leftJoin(users, eq(timeOffRequests.userId, users.id))
+                .where(inArray(users.departmentId, deptIds))
+                .orderBy(desc(timeOffRequests.createdAt))
+                .all();
+
+            return new Response(JSON.stringify(entries), {
+                headers: { 'Content-Type': 'application/json' }
+            });
+        }
+
+        // Default / User view
+        let query = db.select(selectFields)
             .from(timeOffRequests)
             .leftJoin(users, eq(timeOffRequests.userId, users.id))
             .orderBy(desc(timeOffRequests.createdAt));
 
         if (userId) {
-            // @ts-ignore - drizzle type inference issue with dynamic queries
+            // @ts-ignore
             query = query.where(eq(timeOffRequests.userId, userId));
         }
 
