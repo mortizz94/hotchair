@@ -1,0 +1,69 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './components/AuthProvider';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Admin from './pages/Admin';
+import History from './pages/History';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Leaderboard from './pages/Leaderboard';
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+    const { user, isLoading } = useAuth();
+
+    if (isLoading) {
+        return <div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>;
+    }
+
+    if (!user) {
+        return <Navigate to="/login" replace />;
+    }
+
+    return <>{children}</>;
+}
+
+function App() {
+    return (
+        <AuthProvider>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/privacy" element={<PrivacyPolicy />} />
+                    <Route
+                        path="/"
+                        element={
+                            <ProtectedRoute>
+                                <Dashboard />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/admin"
+                        element={
+                            <ProtectedRoute>
+                                <Admin />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/history"
+                        element={
+                            <ProtectedRoute>
+                                <History />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/leaderboard"
+                        element={
+                            <ProtectedRoute>
+                                <Leaderboard />
+                            </ProtectedRoute>
+                        }
+                    />
+                </Routes>
+            </BrowserRouter>
+        </AuthProvider>
+    );
+}
+
+export default App;
