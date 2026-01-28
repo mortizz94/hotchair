@@ -14,6 +14,8 @@ export type User = {
     streak?: number;
     // Dynamic
     status?: 'present' | 'absent';
+    location?: 'office' | 'remote';
+    totalMinutesToday?: number;
 };
 
 export type Department = {
@@ -54,6 +56,13 @@ export type DashboardData = {
         status: 'present' | 'absent';
         streak: number;
         badges: string[];
+        upcomingAbsences?: {
+            id: number;
+            startDate: string;
+            endDate: string;
+            type: string;
+            status: string;
+        }[];
     };
     topSnitches: { name: string; count: number }[];
     topSuspicious: { name: string; count: number }[];

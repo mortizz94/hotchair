@@ -2,11 +2,11 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './components/AuthProvider';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Team from './pages/Team';
 import Admin from './pages/Admin';
 import History from './pages/History';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Leaderboard from './pages/Leaderboard';
-import TimeTracking from './pages/TimeTracking';
 import Departments from './pages/Departments';
 import Analytics from './pages/Analytics';
 import TimeOff from './pages/TimeOff';
@@ -52,6 +52,14 @@ function App() {
                         }
                     />
                     <Route
+                        path="/team"
+                        element={
+                            <ProtectedRoute>
+                                <Team />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
                         path="/admin"
                         element={
                             <ProtectedRoute>
@@ -80,14 +88,6 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <Departments />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/time-tracking"
-                        element={
-                            <ProtectedRoute>
-                                <TimeTracking />
                             </ProtectedRoute>
                         }
                     />

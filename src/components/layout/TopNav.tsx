@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Flame, LogOut, Settings, Clock, Map, Briefcase, TrendingUp, Palmtree } from 'lucide-react';
+import { Menu, X, Flame, LogOut, Settings, Briefcase, TrendingUp, Palmtree, Users } from 'lucide-react';
 import { User, DashboardData } from '../../types';
 
 interface TopNavProps {
@@ -18,8 +18,7 @@ export function TopNav({ user, dashboardData, logout, onOpenProfile }: TopNavPro
 
     const navLinks = [
         { path: '/', label: 'Dashboard', icon: Flame },
-        { path: '/time-tracking', label: 'Fichar', icon: Clock },
-        { path: '/map', label: 'Mapa', icon: Map },
+        { path: '/team', label: 'Compañeros', icon: Users },
         { path: '/time-off', label: 'Ausencias', icon: Palmtree },
         //{ path: '/leaderboard', label: 'Ranking', icon: Trophy }, // Removed as per request? User said "la ruleta quitala", didn't explicitly say remove ranking but user said "el menu no me gusta". keeping ranking is good for "gamification". User said "creo que los usuarios deben estar dentro de x departamento".
         // Let's keep common links.

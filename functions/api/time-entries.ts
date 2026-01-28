@@ -1,5 +1,5 @@
 import { getDb } from '../utils/db';
-import { timeEntries } from '../../src/db/schema';
+import { timeEntries, attendance, allowedIps } from '../../src/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
 
 export const onRequestGet = async (context: any) => {
@@ -38,18 +38,50 @@ export const onRequestPost = async (context: any) => {
 
     // Check if there is already an active entry
     const activeEntry = await db.select().from(timeEntries)
-        .where(and(eq(timeEntries.userId, userId), eq(timeEntries.endTime, null as any))) // Drizzle might need direct null check differently depending on driver, but usually this works or isNull()
+        .where(and(eq(timeEntries.userId, userId), eq(timeEntries.endTime, null as any)))
         .get();
 
     if (activeEntry) {
         return new Response(JSON.stringify({ error: 'Already clocked in', activeEntry }), { status: 409 });
-        // Ideally we might want to return 409 Conflict
     }
 
     const now = new Date();
     const dateStr = now.toISOString().split('T')[0];
     const timestamp = now.getTime();
 
+    // 1. Determine Location
+    let location = 'remote';
+    const clientIP = context.request.headers.get('CF-Connecting-IP') || '127.0.0.1';
+    const LOCAL_IPS = ['127.0.0.1', '::1', 'localhost'];
+
+    // Fetch Allowed IPs
+    const allowedIpsList = await db.query.allowedIps.findMany();
+    const allowed = allowedIpsList.map((i: any) => i.ip);
+
+    if (allowed.includes(clientIP) || LOCAL_IPS.includes(clientIP)) {
+        location = 'office';
+    }
+
+    // 2. Upsert Attendance (Side Effect: Mark as Present)
+    const existingAttendance = await db.query.attendance.findFirst({
+        where: and(eq(attendance.userId, userId), eq(attendance.date, dateStr))
+    });
+
+    if (existingAttendance) {
+        await db.update(attendance)
+            .set({ isPresent: true, location, timestamp: Date.now() })
+            .where(eq(attendance.id, existingAttendance.id));
+    } else {
+        await db.insert(attendance).values({
+            userId,
+            date: dateStr,
+            isPresent: true,
+            location,
+            timestamp: Date.now(),
+        });
+    }
+
+    // 3. Insert Time Entry
     const result = await db.insert(timeEntries).values({
         userId,
         date: dateStr,

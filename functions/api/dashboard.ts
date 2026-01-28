@@ -1,5 +1,6 @@
 import { getDb } from '../utils/db';
-import { users, attendance, votes } from '../../src/db/schema';
+import { users, attendance, votes, timeEntries, timeOffRequests } from '../../src/db/schema';
+import { eq, and, gt, or } from 'drizzle-orm';
 import { calculateGamification } from '../utils/gamification';
 
 export const onRequestGet = async (context: any) => {
@@ -25,6 +26,7 @@ export const onRequestGet = async (context: any) => {
         return {
             ...u,
             status: att?.isPresent ? 'present' : 'absent',
+            location: att?.location as 'office' | 'remote' | undefined,
             seatId: att?.seatId,
             streak,
             level,
@@ -62,14 +64,48 @@ export const onRequestGet = async (context: any) => {
 
     // 5. Current User
     let currentUserData = null;
+    let totalMinutesToday = 0;
+
     if (currentUserId) {
         currentUserData = allUsersWithStatus.find(u => u.id === currentUserId) || null;
+
+        // Calculate total minutes for today
+        // We need time entries for this user and today
+        // Note: We need to fetch time entries first
+        const userEntries = await db.select().from(timeEntries)
+            .where(and(eq(timeEntries.userId, currentUserId), eq(timeEntries.date, today)))
+            .all();
+
+        userEntries.forEach((entry: any) => {
+            const start = entry.startTime;
+            const end = entry.endTime || Date.now();
+            totalMinutesToday += Math.floor((end - start) / 1000 / 60);
+        });
+
+        // Fetch upcoming time off requests (approved or pending, future dates)
+        // db vs db.select() - using query builder style
+        // We need to import timeOffRequests and gt from drizzle
+        // But for now, let's keep it simple. If we don't have gt (greater than), we filter in JS.
+        // Actually imports are needed at top.
+    }
+
+    let upcomingAbsences: any[] = [];
+    if (currentUserId) {
+        const userAbsences = await db.select().from(timeOffRequests)
+            .where(eq(timeOffRequests.userId, currentUserId))
+            .all();
+
+        // Filter in JS for simplicity with dates
+        upcomingAbsences = userAbsences.filter((req: any) => {
+            return req.startDate >= today && (req.status === 'approved' || req.status === 'pending');
+        }).sort((a: any, b: any) => a.startDate.localeCompare(b.startDate))
+            .slice(0, 3); // Top 3
     }
 
     return new Response(JSON.stringify({
         users: allUsersWithStatus,
         attendance: dailyAttendance,
-        currentUser: currentUserData,
+        currentUser: currentUserData ? { ...currentUserData, totalMinutesToday, upcomingAbsences } : null,
         votes: dailyVotes,
         topSnitches: snitchRanking,
         topSuspicious: suspiciousRanking

@@ -30,7 +30,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         fetchLayoutData();
     }, [user?.id]);
 
-    const handleUpdateProfile = async (data: { userId: string, newPin?: string, altaiUser?: string, altaiPassword?: string, departmentId?: number }) => {
+    const handleUpdateProfile = async (data: { userId: string, newPin?: string, departmentId?: number }) => {
         try {
             const res = await fetch('/api/profile', {
                 method: 'PUT',
@@ -73,8 +73,6 @@ export function AppLayout({ children }: AppLayoutProps) {
                     isOpen={isProfileOpen}
                     onClose={() => setIsProfileOpen(false)}
                     currentUser={user}
-                    currentAltaiUser={dashboardData?.currentUser?.altaiUser}
-                    currentAltaiPassword={dashboardData?.currentUser?.altaiPassword}
                     onUpdateProfile={handleUpdateProfile}
                 />
             )}

@@ -86,71 +86,48 @@
 }
 
 :root {
-    /* Bento Grid Palette - Light/Soft Dark Hybrid */
-    --background: #f2f4f6;
-    /* Soft gray background */
-    --foreground: #1a1a1a;
+    /* Refined Light Palette */
+    --background: #f8fafc;
+    /* Slate 50 - Cleaner / Brighter */
+    --foreground: #0f172a;
+    /* Slate 900 - High contrast */
 
     --card: #ffffff;
-    --card-foreground: #1a1a1a;
+    --card-foreground: #0f172a;
 
     --popover: #ffffff;
-    --popover-foreground: #1a1a1a;
+    --popover-foreground: #0f172a;
 
     --primary: #2563eb;
-    /* Royal Blue */
+    /* Royal Blue - keeping it vibrant */
     --primary-foreground: #ffffff;
 
-    --secondary: #e2e8f0;
-    --secondary-foreground: #1e293b;
+    --secondary: #f1f5f9;
+    /* Slate 100 */
+    --secondary-foreground: #0f172a;
 
     --muted: #f1f5f9;
+    /* Slate 100 */
     --muted-foreground: #64748b;
+    /* Slate 500 */
 
     --accent: #eff6ff;
+    /* Blue 50 */
     --accent-foreground: #2563eb;
 
     --destructive: #ef4444;
     --destructive-foreground: #ffffff;
 
     --border: #e2e8f0;
+    /* Slate 200 */
     --input: #e2e8f0;
     --ring: #2563eb;
 
-    --radius: 1.5rem;
-    /* Rounds 3xl */
+    --radius: 1rem;
+    /* Slightly tighter radius for more modern feel */
 }
 
-/* Dark Mode Overrides (Optional, keeping it clean for now) */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0f172a;
-        /* Slate 900 */
-        --foreground: #f8fafc;
-
-        --card: #1e293b;
-        /* Slate 800 */
-        --card-foreground: #f8fafc;
-
-        --popover: #1e293b;
-        --popover-foreground: #f8fafc;
-
-        --primary: #3b82f6;
-        --primary-foreground: #ffffff;
-
-        --secondary: #334155;
-        --secondary-foreground: #f8fafc;
-
-        --muted: #334155;
-        --muted-foreground: #94a3b8;
-
-        --accent: #1e293b;
-        --accent-foreground: #f8fafc;
-
-        --border: #334155;
-        --input: #334155;
-    }
-}
+/* Dark Mode Overrides Removed */
 
 @layer base {
     * {
@@ -174,6 +151,6 @@
     }
 
     .glass-panel {
-        @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-white/5;
+        @apply bg-white/70 backdrop-blur-xl border border-white/20;
     }
 }

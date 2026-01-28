@@ -6,16 +6,12 @@ interface ProfileModalProps {
     isOpen: boolean;
     onClose: () => void;
     currentUser: User | null;
-    currentAltaiUser?: string;
-    currentAltaiPassword?: string;
-    onUpdateProfile: (data: { userId: string, newPin?: string, altaiUser?: string, altaiPassword?: string, departmentId?: number }) => Promise<boolean>;
+    onUpdateProfile: (data: { userId: string, newPin?: string, departmentId?: number }) => Promise<boolean>;
 }
 
-export function ProfileModal({ isOpen, onClose, currentUser, currentAltaiUser, currentAltaiPassword, onUpdateProfile }: ProfileModalProps) {
+export function ProfileModal({ isOpen, onClose, currentUser, onUpdateProfile }: ProfileModalProps) {
     const [newPin, setNewPin] = useState('');
     const [confirmPin, setConfirmPin] = useState('');
-    const [altaiUser, setAltaiUser] = useState('');
-    const [altaiPassword, setAltaiPassword] = useState('');
     const [departmentId, setDepartmentId] = useState<number | undefined>(currentUser?.departmentId);
     const [departments, setDepartments] = useState<Department[]>([]);
 
@@ -24,8 +20,6 @@ export function ProfileModal({ isOpen, onClose, currentUser, currentAltaiUser, c
 
     useEffect(() => {
         if (isOpen) {
-            setAltaiUser(currentAltaiUser || '');
-            setAltaiPassword(currentAltaiPassword || '');
             setDepartmentId(currentUser?.departmentId);
             setNewPin('');
             setConfirmPin('');
@@ -36,7 +30,7 @@ export function ProfileModal({ isOpen, onClose, currentUser, currentAltaiUser, c
                 .then(data => setDepartments(data as Department[]))
                 .catch(console.error);
         }
-    }, [isOpen, currentAltaiUser, currentAltaiPassword, currentUser]);
+    }, [isOpen, currentUser]);
 
     if (!isOpen) return null;
 
@@ -61,8 +55,6 @@ export function ProfileModal({ isOpen, onClose, currentUser, currentAltaiUser, c
             const success = await onUpdateProfile({
                 userId: currentUser.id,
                 newPin: newPin || undefined,
-                altaiUser,
-                altaiPassword,
                 departmentId
             });
 
@@ -141,32 +133,6 @@ export function ProfileModal({ isOpen, onClose, currentUser, currentAltaiUser, c
                                     <option key={dept.id} value={dept.id}>{dept.name}</option>
                                 ))}
                             </select>
-                        </div>
-                    </div>
-                    <div className="space-y-4 pt-4 border-t border-zinc-700">
-                        <h4 className="text-zinc-300 font-bold text-sm uppercase tracking-wide">Credenciales Altai</h4>
-                        <p className="text-xs text-zinc-500 mb-2">
-                            Guarda aquí tus datos de Altai para copiarlos automáticamente al fichar.
-                        </p>
-                        <div>
-                            <label className="block text-zinc-400 text-xs font-bold mb-1 uppercase tracking-wider">Usuario Altai (DNI/Email)</label>
-                            <input
-                                type="text"
-                                value={altaiUser}
-                                onChange={(e) => setAltaiUser(e.target.value)}
-                                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-orange-500 outline-none transition-all placeholder:text-zinc-600 font-mono text-sm"
-                                placeholder="Tu usuario de Altai"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-zinc-400 text-xs font-bold mb-1 uppercase tracking-wider">Contraseña Altai</label>
-                            <input
-                                type="password"
-                                value={altaiPassword}
-                                onChange={(e) => setAltaiPassword(e.target.value)}
-                                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-orange-500 outline-none transition-all placeholder:text-zinc-600 font-mono text-sm"
-                                placeholder="Tu contraseña"
-                            />
                         </div>
                     </div>
 
