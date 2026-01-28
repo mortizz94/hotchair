@@ -3,7 +3,6 @@ import { TopNav } from './TopNav';
 import { DashboardData } from '../../types';
 import { useAuth } from '../AuthProvider';
 import { ProfileModal } from '../dashboard/ProfileModal';
-import { ProfileModal } from '../dashboard/ProfileModal';
 
 interface AppLayoutProps {
     children: ReactNode;
