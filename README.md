@@ -1,4 +1,4 @@
-# HotChair v6.6.6
+# HotChair
 Distributed Attendance Verification System
 
 ## Stack
