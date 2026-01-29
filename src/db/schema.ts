@@ -78,3 +78,8 @@ export const seats = sqliteTable('seats', {
     status: text('status').default('available'), // available, occupied
     assignedUserId: text('assigned_user_id'), // if permanently assigned
 });
+
+export const settings = sqliteTable('settings', {
+    key: text('key').primaryKey(), // e.g., 'mood_threshold'
+    value: text('value').notNull(), // e.g., '60'
+});

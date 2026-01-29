@@ -9,17 +9,31 @@ type User = {
     code: string;
     role: 'admin' | 'user';
     pin: string; // Visible for admin
+    departmentId: number | null;
+};
+
+type Department = {
+    id: number;
+    name: string;
+    color: string;
 };
 
 export default function Admin() {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [users, setUsers] = useState<User[]>([]);
+    const [departments, setDepartments] = useState<Department[]>([]);
     const [loading, setLoading] = useState(true);
+
+    // Create User State
     const [newName, setNewName] = useState('');
     const [newCode, setNewCode] = useState('');
     const [newPin, setNewPin] = useState('');
     const [newRole, setNewRole] = useState<'user' | 'admin'>('user');
+    const [newDeptId, setNewDeptId] = useState<string>('');
+
+    // Settings State
+    const [moodThreshold, setMoodThreshold] = useState('60');
 
     // Security Redirect
     useEffect(() => {
@@ -28,12 +42,25 @@ export default function Admin() {
         }
     }, [user, navigate]);
 
-    const fetchUsers = async () => {
+    const fetchData = async () => {
         try {
-            const res = await fetch('/api/users');
-            if (res.ok) {
-                const data = await res.json() as User[];
+            const [resUsers, resDepts, resSettings] = await Promise.all([
+                fetch('/api/users'),
+                fetch('/api/departments'),
+                fetch('/api/settings')
+            ]);
+
+            if (resUsers.ok) {
+                const data = await resUsers.json() as User[];
                 setUsers(data);
+            }
+            if (resDepts.ok) {
+                const data = await resDepts.json() as Department[];
+                setDepartments(data);
+            }
+            if (resSettings.ok) {
+                const data = await resSettings.json() as any;
+                if (data.mood_threshold) setMoodThreshold(data.mood_threshold);
             }
         } finally {
             setLoading(false);
@@ -41,7 +68,7 @@ export default function Admin() {
     };
 
     useEffect(() => {
-        fetchUsers();
+        fetchData();
     }, []);
 
     const handleCreate = async (e: React.FormEvent) => {
@@ -49,14 +76,21 @@ export default function Admin() {
         const res = await fetch('/api/users', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: newName, code: newCode, pin: newPin, role: newRole })
+            body: JSON.stringify({
+                name: newName,
+                code: newCode,
+                pin: newPin,
+                role: newRole,
+                departmentId: newDeptId ? parseInt(newDeptId) : null
+            })
         });
 
         if (res.ok) {
             setNewName('');
             setNewCode('');
             setNewPin('');
-            fetchUsers();
+            setNewDeptId('');
+            fetchData();
         } else {
             alert('Error creating user (Code might be duplicate)');
         }
@@ -66,10 +100,30 @@ export default function Admin() {
         if (!confirm('¿Seguro que quieres eliminar este usuario?')) return;
 
         await fetch(`/api/users/${id}`, { method: 'DELETE' });
-        fetchUsers();
+        fetchData();
     };
 
-    // IP Management
+    const handleUpdateDepartment = async (userId: string, deptId: string) => {
+        await fetch(`/api/users/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ departmentId: deptId ? parseInt(deptId) : null })
+        });
+        fetchData();
+    };
+
+    const handleSaveSettings = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const res = await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: 'mood_threshold', value: moodThreshold })
+        });
+        if (res.ok) alert('Configuración guardada');
+        else alert('Error al guardar');
+    };
+
+    // IP Management Variables
     type AllowedIp = { id: number, ip: string, label: string, createdAt: number };
     const [ips, setIps] = useState<AllowedIp[]>([]);
     const [newIp, setNewIp] = useState('');
@@ -79,7 +133,7 @@ export default function Admin() {
         if (!user) return;
         const res = await fetch(`/api/ips?userId=${user.id}`);
         if (res.ok) {
-            const data = await res.json();
+            const data = await res.json() as AllowedIp[];
             setIps(data);
         }
     };
@@ -112,6 +166,7 @@ export default function Admin() {
         fetchIps();
     };
 
+
     if (loading) return <div className="p-10">Cargando...</div>;
 
     return (
@@ -127,6 +182,31 @@ export default function Admin() {
             </header>
 
             <main className="max-w-4xl mx-auto space-y-10">
+                {/* Configuration Section */}
+                <section className="bg-card rounded-xl border border-border p-6">
+                    <h2 className="text-xl font-semibold mb-4">Configuración General</h2>
+                    <form onSubmit={handleSaveSettings} className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Porcentaje de Felicidad (Umbral)</label>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    className="bg-background border border-input rounded p-2 w-full"
+                                    value={moodThreshold}
+                                    onChange={e => setMoodThreshold(e.target.value)}
+                                />
+                                <span className="text-muted-foreground">%</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">Si la asistencia supera este porcentaje, el niño estará feliz.</p>
+                        </div>
+                        <button className="bg-primary text-primary-foreground py-2 px-4 rounded font-bold hover:bg-primary/90">
+                            Guardar Configuración
+                        </button>
+                    </form>
+                </section>
+
                 {/* User Section */}
                 <section className="grid grid-cols-1 md:grid-cols-2 gap-10">
                     {/* User List */}
@@ -134,19 +214,34 @@ export default function Admin() {
                         <h2 className="text-xl font-semibold mb-4">Usuarios</h2>
                         <ul className="space-y-3">
                             {users.map(u => (
-                                <li key={u.id} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                                    <div>
-                                        <div className="font-bold">{u.name} {u.role === 'admin' && <span className="text-xs bg-yellow-500/20 text-yellow-500 px-1 rounded">ADMIN</span>}</div>
-                                        <div className="text-xs text-muted-foreground">Code: {u.code} | PIN: {u.pin}</div>
+                                <li key={u.id} className="flex flex-col gap-2 p-3 bg-muted/50 rounded-lg">
+                                    <div className="flex justify-between items-center">
+                                        <div>
+                                            <div className="font-bold">{u.name} {u.role === 'admin' && <span className="text-xs bg-yellow-500/20 text-yellow-500 px-1 rounded">ADMIN</span>}</div>
+                                            <div className="text-xs text-muted-foreground">Code: {u.code} | PIN: {u.pin}</div>
+                                        </div>
+                                        {u.id !== user?.id && (
+                                            <button
+                                                onClick={() => handleDelete(u.id)}
+                                                className="text-red-500 hover:bg-red-900/20 p-2 rounded"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        )}
                                     </div>
-                                    {u.id !== user?.id && (
-                                        <button
-                                            onClick={() => handleDelete(u.id)}
-                                            className="text-red-500 hover:bg-red-900/20 p-2 rounded"
+                                    <div className="flex gap-2 items-center">
+                                        <label className="text-xs text-muted-foreground whitespace-nowrap">Dpto:</label>
+                                        <select
+                                            className="text-xs bg-background border border-border rounded px-2 py-1 flex-1"
+                                            value={u.departmentId || ''}
+                                            onChange={(e) => handleUpdateDepartment(u.id, e.target.value)}
                                         >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    )}
+                                            <option value="">Sin Departamento</option>
+                                            {departments.map(d => (
+                                                <option key={d.id} value={d.id}>{d.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
                                 </li>
                             ))}
                         </ul>
@@ -183,17 +278,33 @@ export default function Admin() {
                                     required
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Rol</label>
-                                <select
-                                    className="w-full bg-background border border-input rounded p-2"
-                                    value={newRole}
-                                    onChange={(e: any) => setNewRole(e.target.value)}
-                                >
-                                    <option value="user">Usuario</option>
-                                    <option value="admin">Administrador</option>
-                                </select>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Rol</label>
+                                    <select
+                                        className="w-full bg-background border border-input rounded p-2"
+                                        value={newRole}
+                                        onChange={(e: any) => setNewRole(e.target.value)}
+                                    >
+                                        <option value="user">Usuario</option>
+                                        <option value="admin">Administrador</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Departamento</label>
+                                    <select
+                                        className="w-full bg-background border border-input rounded p-2"
+                                        value={newDeptId}
+                                        onChange={(e) => setNewDeptId(e.target.value)}
+                                    >
+                                        <option value="">Ninguno</option>
+                                        {departments.map(d => (
+                                            <option key={d.id} value={d.id}>{d.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
+
                             <button className="w-full bg-primary text-primary-foreground py-2 rounded font-bold hover:bg-primary/90">
                                 Crear Usuario
                             </button>

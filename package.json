@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/generate-version.js && vite build",
     "preview": "npm run build && wrangler pages dev dist",
     "deploy": "npm run build && wrangler pages deploy dist",
     "db:generate": "drizzle-kit generate",

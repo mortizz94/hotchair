@@ -86,48 +86,37 @@
 }
 
 :root {
-    /* Refined Light Palette */
-    --background: #f8fafc;
-    /* Slate 50 - Cleaner / Brighter */
-    --foreground: #0f172a;
-    /* Slate 900 - High contrast */
+    /* Enforced Dark Mode Palette */
+    --background: #09090b; /* Zinc 950 */
+    --foreground: #fafafa; /* Zinc 50 */
 
-    --card: #ffffff;
-    --card-foreground: #0f172a;
+    --card: #18181b; /* Zinc 900 */
+    --card-foreground: #fafafa;
 
-    --popover: #ffffff;
-    --popover-foreground: #0f172a;
+    --popover: #18181b;
+    --popover-foreground: #fafafa;
 
-    --primary: #2563eb;
-    /* Royal Blue - keeping it vibrant */
-    --primary-foreground: #ffffff;
+    --primary: #f97316; /* Orange 500 - HotChair Brand */
+    --primary-foreground: #fafafa;
 
-    --secondary: #f1f5f9;
-    /* Slate 100 */
-    --secondary-foreground: #0f172a;
+    --secondary: #27272a; /* Zinc 800 */
+    --secondary-foreground: #fafafa;
 
-    --muted: #f1f5f9;
-    /* Slate 100 */
-    --muted-foreground: #64748b;
-    /* Slate 500 */
+    --muted: #27272a;
+    --muted-foreground: #a1a1aa; /* Zinc 400 */
 
-    --accent: #eff6ff;
-    /* Blue 50 */
-    --accent-foreground: #2563eb;
+    --accent: #27272a;
+    --accent-foreground: #fafafa;
 
-    --destructive: #ef4444;
-    --destructive-foreground: #ffffff;
+    --destructive: #7f1d1d; /* Red 900 */
+    --destructive-foreground: #fafafa;
 
-    --border: #e2e8f0;
-    /* Slate 200 */
-    --input: #e2e8f0;
-    --ring: #2563eb;
+    --border: #27272a;
+    --input: #27272a;
+    --ring: #f97316;
 
     --radius: 1rem;
-    /* Slightly tighter radius for more modern feel */
 }
-
-/* Dark Mode Overrides Removed */
 
 @layer base {
     * {

@@ -22,7 +22,7 @@ export const onRequestGet = async (context: any) => {
 
 export const onRequestPost = async (context: any) => {
     try {
-        const { name, code, pin, role } = await context.request.json();
+        const { name, code, pin, role, departmentId } = await context.request.json();
         const db = getDb(context);
 
         if (!name || !code || !pin) {
@@ -36,7 +36,8 @@ export const onRequestPost = async (context: any) => {
             name,
             code,
             pin,
-            role: role || 'user'
+            role: role || 'user',
+            departmentId: departmentId ? parseInt(departmentId) : null
         });
 
         return new Response(JSON.stringify({ success: true, id }), { status: 201 });

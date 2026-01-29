@@ -71,6 +71,20 @@
       "when": 1769597036088,
       "tag": "0009_peaceful_joseph",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1769674230712,
+      "tag": "0010_nifty_tattoo",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1769675196724,
+      "tag": "0011_curious_nico_minoru",
+      "breakpoints": true
     }
   ]
 }
