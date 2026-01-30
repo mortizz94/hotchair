@@ -4,7 +4,6 @@ import { TimeTrackerWidget } from '../components/dashboard/TimeTrackerWidget';
 import { useAuth } from '../components/AuthProvider';
 import { useDashboard } from '../hooks/useDashboard';
 import { MoodCard } from '../components/dashboard/MoodCard';
-import { CheckInGroup } from '../components/dashboard/CheckInGroup';
 
 export default function Dashboard() {
     const { user, logout: handleLogout, deleteAccount } = useAuth();
@@ -12,7 +11,7 @@ export default function Dashboard() {
     const { dashboardQuery, checkInMutation } = useDashboard();
 
     const { data, isLoading } = dashboardQuery;
-    const { mutate: checkIn, isPending: isCheckInLoading } = checkInMutation;
+    const { mutate: checkIn } = checkInMutation;
 
     // Derived State
     const isPresent = data?.currentUser?.status === 'present';
@@ -52,12 +51,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* Check-in Action Card */}
-            <CheckInGroup
-                isPresent={isPresent}
-                onCheckIn={handleCheckIn}
-                isLoading={isCheckInLoading}
-            />
+
 
             {/* Main Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -125,7 +119,11 @@ export default function Dashboard() {
 
                 {/* Right Column: Time Tracker (Span 4) */}
                 <div className="lg:col-span-4 flex flex-col gap-6">
-                    <TimeTrackerWidget totalMinutesToday={data?.currentUser?.totalMinutesToday} />
+                    <TimeTrackerWidget
+                        totalMinutesToday={data?.currentUser?.totalMinutesToday}
+                        onTimerStart={() => handleCheckIn(true)}
+                        onTimerStop={() => handleCheckIn(false)}
+                    />
 
                     {/* Quick Profile / Actions */}
                     <div className="bg-card rounded-[2rem] p-6 border border-border/50 shadow-sm relative overflow-hidden">

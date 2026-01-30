@@ -5,9 +5,11 @@ import { useSoundEffects } from '../../hooks/useSoundEffects';
 
 interface TimeTrackerWidgetProps {
     totalMinutesToday?: number;
+    onTimerStart?: () => void;
+    onTimerStop?: () => void;
 }
 
-export function TimeTrackerWidget({ totalMinutesToday = 0 }: TimeTrackerWidgetProps) {
+export function TimeTrackerWidget({ totalMinutesToday = 0, onTimerStart, onTimerStop }: TimeTrackerWidgetProps) {
     const { user } = useAuth();
     const [elapsedTime, setElapsedTime] = useState(0);
     const [isActive, setIsActive] = useState(false);
@@ -75,6 +77,7 @@ export function TimeTrackerWidget({ totalMinutesToday = 0 }: TimeTrackerWidgetPr
                     setIsActive(true);
                     setElapsedTime(0);
                     playSuccess();
+                    if (onTimerStart) onTimerStart();
                 }
             } else {
                 // Clock Out
@@ -94,6 +97,7 @@ export function TimeTrackerWidget({ totalMinutesToday = 0 }: TimeTrackerWidgetPr
                     setActiveEntryId(null);
                     setElapsedTime(0);
                     playSuccess();
+                    if (onTimerStop) onTimerStop();
                 }
             }
         } catch (e) {
@@ -146,8 +150,8 @@ export function TimeTrackerWidget({ totalMinutesToday = 0 }: TimeTrackerWidgetPr
                 <button
                     onClick={handleToggle}
                     className={`h-12 w-12 rounded-full flex items-center justify-center transition-all shadow-lg ${isActive
-                            ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/20'
-                            : 'bg-green-500 hover:bg-green-600 text-white shadow-green-500/20'
+                        ? 'bg-red-500 hover:bg-red-600 text-white shadow-red-500/20'
+                        : 'bg-green-500 hover:bg-green-600 text-white shadow-green-500/20'
                         }`}
                 >
                     {isActive ? <Square size={18} fill="currentColor" /> : <Play size={20} fill="currentColor" className="ml-1" />}
