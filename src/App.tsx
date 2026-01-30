@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './components/AuthProvider';
+import { QueryProvider } from './components/QueryProvider';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Team from './pages/Team';
@@ -38,86 +39,88 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function App() {
     return (
-        <AuthProvider>
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/privacy" element={<PrivacyPolicy />} />
-                    <Route
-                        path="/"
-                        element={
-                            <ProtectedRoute>
-                                <Dashboard />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/team"
-                        element={
-                            <ProtectedRoute>
-                                <Team />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/admin"
-                        element={
-                            <ProtectedRoute>
-                                <Admin />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/history"
-                        element={
-                            <ProtectedRoute>
-                                <History />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/leaderboard"
-                        element={
-                            <ProtectedRoute>
-                                <Leaderboard />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/departments"
-                        element={
-                            <ProtectedRoute>
-                                <Departments />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/analytics"
-                        element={
-                            <ProtectedRoute>
-                                <Analytics />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/time-off"
-                        element={
-                            <ProtectedRoute>
-                                <TimeOff />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/map"
-                        element={
-                            <ProtectedRoute>
-                                <OfficeMapPage />
-                            </ProtectedRoute>
-                        }
-                    />
-                </Routes>
-            </BrowserRouter>
-        </AuthProvider>
+        <QueryProvider>
+            <AuthProvider>
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/privacy" element={<PrivacyPolicy />} />
+                        <Route
+                            path="/"
+                            element={
+                                <ProtectedRoute>
+                                    <Dashboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/team"
+                            element={
+                                <ProtectedRoute>
+                                    <Team />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/admin"
+                            element={
+                                <ProtectedRoute>
+                                    <Admin />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/history"
+                            element={
+                                <ProtectedRoute>
+                                    <History />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/leaderboard"
+                            element={
+                                <ProtectedRoute>
+                                    <Leaderboard />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/departments"
+                            element={
+                                <ProtectedRoute>
+                                    <Departments />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/analytics"
+                            element={
+                                <ProtectedRoute>
+                                    <Analytics />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/time-off"
+                            element={
+                                <ProtectedRoute>
+                                    <TimeOff />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/map"
+                            element={
+                                <ProtectedRoute>
+                                    <OfficeMapPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                    </Routes>
+                </BrowserRouter>
+            </AuthProvider>
+        </QueryProvider>
     );
 }
 
