@@ -1,17 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import { Palmtree, LogOut, Trash2, Flame } from 'lucide-react';
-import { TimeTrackerWidget } from '../components/dashboard/TimeTrackerWidget';
 import { useAuth } from '../components/AuthProvider';
 import { useDashboard } from '../hooks/useDashboard';
 import { MoodCard } from '../components/dashboard/MoodCard';
+import { ACTIVITIES } from '../constants';
 
 export default function Dashboard() {
     const { user, logout: handleLogout, deleteAccount } = useAuth();
     const navigate = useNavigate();
-    const { dashboardQuery, checkInMutation } = useDashboard();
+    const { dashboardQuery } = useDashboard();
 
     const { data, isLoading } = dashboardQuery;
-    const { mutate: checkIn } = checkInMutation;
+    // const { mutate: checkIn } = checkInMutation; // Unused
 
     // Derived State
     const isPresent = data?.currentUser?.status === 'present';
@@ -19,10 +19,6 @@ export default function Dashboard() {
     const totalUsers = data?.users.length || 0;
     const occupancyPercentage = totalUsers > 0 ? Math.round((activeUsers / totalUsers) * 100) : 0;
 
-    const handleCheckIn = (present: boolean) => {
-        if (!user) return;
-        checkIn({ userId: user.id, isPresent: present, location: 'office' }); // Default to office
-    };
 
     if (isLoading && !data) return <div className="p-8"><div className="animate-pulse h-96 bg-white/5 rounded-3xl" /></div>;
 
@@ -46,7 +42,11 @@ export default function Dashboard() {
                     }`}>
                     <span className={`w-3 h-3 rounded-full ${params(isPresent, data?.currentUser?.location).dotColor}`}></span>
                     {isPresent
-                        ? (data?.currentUser?.location === 'office' ? 'Estás en la Oficina' : 'Trabajando en Remoto')
+                        ? (
+                            <span className="flex items-center gap-2">
+                                {data?.currentUser?.activity && ACTIVITIES.find(a => a.id === data.currentUser?.activity)?.label || (data?.currentUser?.location === 'office' ? 'Estás en la Oficina' : 'Trabajando en Remoto')}
+                            </span>
+                        )
                         : 'No has fichado hoy'}
                 </div>
             </div>
@@ -119,12 +119,6 @@ export default function Dashboard() {
 
                 {/* Right Column: Time Tracker (Span 4) */}
                 <div className="lg:col-span-4 flex flex-col gap-6">
-                    <TimeTrackerWidget
-                        totalMinutesToday={data?.currentUser?.totalMinutesToday}
-                        onTimerStart={() => handleCheckIn(true)}
-                        onTimerStop={() => handleCheckIn(false)}
-                    />
-
                     {/* Quick Profile / Actions */}
                     <div className="bg-card rounded-[2rem] p-6 border border-border/50 shadow-sm relative overflow-hidden">
                         <h3 className="text-lg font-bold mb-4">Perfil</h3>

@@ -13,6 +13,8 @@ export const onRequestGet = async (context: any) => {
     const allUsers = await db.select().from(users);
     const allAttendance = await db.select().from(attendance); // We need all for history
     const allVotes = await db.select().from(votes);
+    // Fetch active time entries to determine current activity (Work, Lunch, etc.)
+    const activeTimeEntries = await db.select().from(timeEntries).where(eq(timeEntries.endTime, null as any));
 
     // 2. Daily Data
     const dailyAttendance = allAttendance.filter(a => a.date === today);
@@ -21,11 +23,13 @@ export const onRequestGet = async (context: any) => {
     // 3. Process Users
     const allUsersWithStatus = allUsers.map(u => {
         const att = dailyAttendance.find(a => a.userId === u.id);
+        const activeEntry = activeTimeEntries.find((e: any) => e.userId === u.id);
         const { streak, level, xp, badges } = calculateGamification(allAttendance, allVotes, u.id);
 
         return {
             ...u,
             status: att?.isPresent ? 'present' : 'absent',
+            activity: activeEntry?.type || (att?.isPresent ? 'work' : undefined), // Default to work if present but no entry (legacy)
             location: att?.location as 'office' | 'remote' | undefined,
             seatId: att?.seatId,
             streak,
@@ -105,7 +109,7 @@ export const onRequestGet = async (context: any) => {
     return new Response(JSON.stringify({
         users: allUsersWithStatus,
         attendance: dailyAttendance,
-        currentUser: currentUserData ? { ...currentUserData, totalMinutesToday, upcomingAbsences } : null,
+        currentUser: currentUserData ? { ...currentUserData, totalMinutesToday, upcomingAbsences, avatar: '/avatar.png' } : null,
         votes: dailyVotes,
         topSnitches: snitchRanking,
         topSuspicious: suspiciousRanking

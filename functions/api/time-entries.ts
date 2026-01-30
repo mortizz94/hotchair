@@ -30,7 +30,7 @@ export const onRequestGet = async (context: any) => {
 
 export const onRequestPost = async (context: any) => {
     const db = getDb(context);
-    const { userId, description, projectId } = await context.request.json();
+    const { userId, description, projectId, type } = await context.request.json();
 
     if (!userId) {
         return new Response('Missing userId', { status: 400 });
@@ -87,6 +87,7 @@ export const onRequestPost = async (context: any) => {
         date: dateStr,
         startTime: timestamp,
         description,
+        type: type || 'work',
         projectId
     }).returning();
 
@@ -97,7 +98,7 @@ export const onRequestPost = async (context: any) => {
 
 export const onRequestPut = async (context: any) => {
     const db = getDb(context);
-    const { id, endTime, description, projectId } = await context.request.json();
+    const { id, endTime, description, projectId, type } = await context.request.json();
 
     if (!id) {
         return new Response('Missing entry id', { status: 400 });
@@ -107,6 +108,7 @@ export const onRequestPut = async (context: any) => {
     if (endTime !== undefined) updateData.endTime = endTime;
     if (description !== undefined) updateData.description = description;
     if (projectId !== undefined) updateData.projectId = projectId;
+    if (type !== undefined) updateData.type = type;
 
     // If clocking out (endTimeProvided)
     if (endTime) {

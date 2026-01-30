@@ -3,6 +3,7 @@ import { TopNav } from './TopNav';
 import { DashboardData } from '../../types';
 import { useAuth } from '../AuthProvider';
 import { ProfileModal } from '../dashboard/ProfileModal';
+import { GlobalStatusWidget } from '../common/GlobalStatusWidget';
 
 interface AppLayoutProps {
     children: ReactNode;
@@ -59,7 +60,6 @@ export function AppLayout({ children }: AppLayoutProps) {
                 user={user}
                 dashboardData={dashboardData}
                 logout={logout}
-                onOpenProfile={() => setIsProfileOpen(true)}
             />
 
             {/* Main Content Area */}
@@ -77,6 +77,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 />
             )}
 
+            <GlobalStatusWidget />
         </div>
     );
 }

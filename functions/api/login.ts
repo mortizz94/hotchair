@@ -26,7 +26,7 @@ export const onRequestPost = async (context: any) => {
         // BUT user wanted "reliable". 
         // Let's return the user.id and name. 
 
-        return new Response(JSON.stringify({ user }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        return new Response(JSON.stringify({ user: { ...user, avatar: '/avatar.png' } }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 
     } catch (e: any) {
         return new Response(JSON.stringify({ error: e.message }), { status: 500 });

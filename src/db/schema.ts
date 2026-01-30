@@ -55,6 +55,7 @@ export const timeEntries = sqliteTable('time_entries', {
     startTime: integer('start_time').notNull(), // Timestamp
     endTime: integer('end_time'), // Timestamp, null if currently active
     description: text('description'),
+    type: text('type').default('work'), // work, lunch, meeting, focus
     projectId: text('project_id'),
 });
 
@@ -82,4 +83,14 @@ export const seats = sqliteTable('seats', {
 export const settings = sqliteTable('settings', {
     key: text('key').primaryKey(), // e.g., 'mood_threshold'
     value: text('value').notNull(), // e.g., '60'
+});
+
+export const notifications = sqliteTable('notifications', {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    userId: text('user_id').notNull().references(() => users.id),
+    type: text('type').notNull(), // 'welcome', 'validation', 'achievement', 'system'
+    message: text('message').notNull(),
+    read: integer('read', { mode: 'boolean' }).default(false),
+    data: text('data', { mode: 'json' }), // Optional JSON data
+    createdAt: integer('created_at').notNull().default(sql`(strftime('%s', 'now'))`)
 });

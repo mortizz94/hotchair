@@ -14,6 +14,7 @@ export type User = {
     streak?: number;
     // Dynamic
     status?: 'present' | 'absent';
+    activity?: 'work' | 'lunch' | 'meeting' | 'focus'; // Current activity
     location?: 'office' | 'remote';
     totalMinutesToday?: number;
 };

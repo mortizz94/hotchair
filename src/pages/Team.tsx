@@ -3,6 +3,7 @@ import { useAuth } from '../components/AuthProvider';
 import { DashboardData } from '../types';
 import { SkeletonCard } from '../components/dashboard/SkeletonCard';
 import { Users, Search, MapPin, Monitor, Coffee } from 'lucide-react';
+import { ACTIVITIES } from '../constants';
 
 export default function Team() {
     const { user } = useAuth();
@@ -38,24 +39,34 @@ export default function Team() {
     const remoteUsers = filteredUsers.filter(u => u.status === 'present' && u.location !== 'office'); // Default remote?
     const absentUsers = filteredUsers.filter(u => u.status !== 'present');
 
-    const UserCard = ({ u, isPresent, location }: { u: any, isPresent: boolean, location?: string }) => (
-        <div key={u.id} className="bg-card border border-border/50 p-4 rounded-3xl flex items-center gap-4 hover:shadow-md transition-all group hover:border-orange-500/20 animate-fade-in">
-            <div className="relative">
-                <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center overflow-hidden">
-                    {u.avatar ? <img src={u.avatar} className="w-full h-full object-cover" /> : <span className="font-bold text-muted-foreground text-lg">{u.name.substring(0, 2)}</span>}
+    const UserCard = ({ u, isPresent, location, activity }: { u: any, isPresent: boolean, location?: string, activity?: string }) => {
+        const activityData = activity ? ACTIVITIES.find(a => a.id === activity) : null;
+        return (
+            <div key={u.id} className="bg-card border border-border/50 p-4 rounded-3xl flex items-center gap-4 hover:shadow-md transition-all group hover:border-orange-500/20 animate-fade-in">
+                <div className="relative">
+                    <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center overflow-hidden">
+                        {u.avatar ? <img src={u.avatar} className="w-full h-full object-cover" /> : <span className="font-bold text-muted-foreground text-lg">{u.name.substring(0, 2)}</span>}
+                    </div>
+                    <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-4 border-card ${isPresent ? (location === 'office' ? 'bg-green-500' : 'bg-blue-500') : 'bg-zinc-300'}`} />
                 </div>
-                <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-4 border-card ${isPresent ? (location === 'office' ? 'bg-green-500' : 'bg-blue-500') : 'bg-zinc-300'}`} />
+                <div className="min-w-0">
+                    <p className="font-bold text-base truncate group-hover:text-orange-500 transition-colors">{u.name}</p>
+                    <p className="text-xs text-muted-foreground truncate font-medium flex items-center gap-1">
+                        {isPresent
+                            ? (
+                                activityData ? (
+                                    <>
+                                        <activityData.icon size={12} className={activityData.color.replace('text-', 'text-')} />
+                                        <span>{activityData.label}</span>
+                                    </>
+                                ) : (location === 'office' ? 'En la oficina' : 'Teletrabajando')
+                            )
+                            : 'Ausente'}
+                    </p>
+                </div>
             </div>
-            <div className="min-w-0">
-                <p className="font-bold text-base truncate group-hover:text-orange-500 transition-colors">{u.name}</p>
-                <p className="text-xs text-muted-foreground truncate font-medium">
-                    {isPresent
-                        ? (location === 'office' ? 'En la oficina' : 'Teletrabajando')
-                        : 'Ausente'}
-                </p>
-            </div>
-        </div>
-    );
+        );
+    };
 
     return (
         <div className="space-y-8 animate-fade-in max-w-[1600px] mx-auto">
@@ -102,7 +113,7 @@ export default function Team() {
                                 <h2 className="text-lg font-bold">En la Oficina <span className="text-muted-foreground text-sm font-normal">({officeUsers.length})</span></h2>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                {officeUsers.map(u => <UserCard key={u.id} u={u} isPresent={true} location="office" />)}
+                                {officeUsers.map(u => <UserCard key={u.id} u={u} isPresent={true} location="office" activity={u.activity} />)}
                             </div>
                         </section>
                     )}
@@ -115,7 +126,7 @@ export default function Team() {
                                 <h2 className="text-lg font-bold">Teletrabajando <span className="text-muted-foreground text-sm font-normal">({remoteUsers.length})</span></h2>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                {remoteUsers.map(u => <UserCard key={u.id} u={u} isPresent={true} location={u.location || 'remote'} />)}
+                                {remoteUsers.map(u => <UserCard key={u.id} u={u} isPresent={true} location={u.location || 'remote'} activity={u.activity} />)}
                             </div>
                         </section>
                     )}

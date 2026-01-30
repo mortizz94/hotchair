@@ -12,6 +12,9 @@ import Departments from './pages/Departments';
 import Analytics from './pages/Analytics';
 import TimeOff from './pages/TimeOff';
 import OfficeMapPage from './pages/OfficeMapPage';
+import CalendarPage from './pages/CalendarPage';
+
+import ProfilePage from './pages/ProfilePage';
 
 import { AppLayout } from './components/layout/AppLayout';
 
@@ -114,6 +117,23 @@ function App() {
                             element={
                                 <ProtectedRoute>
                                     <OfficeMapPage />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/calendar"
+                            element={
+                                <ProtectedRoute>
+                                    <CalendarPage />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/profile"
+                            element={
+                                <ProtectedRoute>
+                                    <ProfilePage />
                                 </ProtectedRoute>
                             }
                         />

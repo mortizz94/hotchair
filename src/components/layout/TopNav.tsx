@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Flame, LogOut, Settings, Briefcase, TrendingUp, Palmtree, Users } from 'lucide-react';
 import { User, DashboardData } from '../../types';
+import { NotificationCenter } from '../common/NotificationCenter';
 
 interface TopNavProps {
     user: User | null;
     dashboardData: DashboardData | null;
     logout: () => void;
-    onOpenProfile: () => void;
 }
 
-export function TopNav({ user, dashboardData, logout, onOpenProfile }: TopNavProps) {
+export function TopNav({ user, dashboardData, logout }: TopNavProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
 
@@ -19,9 +19,9 @@ export function TopNav({ user, dashboardData, logout, onOpenProfile }: TopNavPro
     const navLinks = [
         { path: '/', label: 'Dashboard', icon: Flame },
         { path: '/team', label: 'Compañeros', icon: Users },
+        { path: '/calendar', label: 'Calendario', icon: Palmtree },
         { path: '/time-off', label: 'Ausencias', icon: Palmtree },
-        //{ path: '/leaderboard', label: 'Ranking', icon: Trophy }, // Removed as per request? User said "la ruleta quitala", didn't explicitly say remove ranking but user said "el menu no me gusta". keeping ranking is good for "gamification". User said "creo que los usuarios deben estar dentro de x departamento".
-        // Let's keep common links.
+        { path: '/profile', label: 'Mi Perfil', icon: Flame },
     ];
 
     const adminLinks = [
@@ -78,9 +78,10 @@ export function TopNav({ user, dashboardData, logout, onOpenProfile }: TopNavPro
 
                 {/* Right Side / Mobile Menu Toggle */}
                 <div className="flex items-center gap-3">
+                    <NotificationCenter />
                     {/* User Profile Trigger */}
-                    <button
-                        onClick={onOpenProfile}
+                    <Link
+                        to="/profile"
                         className="hidden md:flex items-center gap-3 pl-2 pr-4 py-1.5 rounded-full border border-border hover:border-orange-500/30 transition-all bg-card hover:shadow-sm group"
                     >
                         <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-600 font-bold text-xs ring-2 ring-transparent group-hover:ring-orange-500/20 transition-all">
@@ -90,7 +91,7 @@ export function TopNav({ user, dashboardData, logout, onOpenProfile }: TopNavPro
                             <p className="text-xs font-bold leading-none">{user?.name.split(' ')[0]}</p>
                             <p className="text-[10px] text-muted-foreground leading-none mt-1">LVL {dashboardData?.currentUser?.level || 1}</p>
                         </div>
-                    </button>
+                    </Link>
 
                     {/* Mobile Toggle */}
                     <button
@@ -140,16 +141,14 @@ export function TopNav({ user, dashboardData, logout, onOpenProfile }: TopNavPro
                             </div>
                         )}
                         <div className="h-px bg-border my-2" />
-                        <button
-                            onClick={() => {
-                                onOpenProfile();
-                                setIsMenuOpen(false);
-                            }}
+                        <Link
+                            to="/profile"
+                            onClick={() => setIsMenuOpen(false)}
                             className="w-full flex items-center gap-3 p-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-muted"
                         >
                             <Settings size={18} />
                             Mi Perfil
-                        </button>
+                        </Link>
                         <button
                             onClick={logout}
                             className="w-full flex items-center gap-3 p-3 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10"

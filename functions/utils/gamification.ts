@@ -2,6 +2,7 @@ export type GamificationStats = {
     streak: number;
     level: number;
     xp: number;
+    nextLevelXp: number;
     badges: string[];
 };
 
@@ -73,6 +74,7 @@ export function calculateGamification(attendance: any[], votes: any[], userId: s
 
     // 3. Level Calculation
     const level = Math.floor(xp / 100) + 1;
+    const nextLevelXp = level * 100;
 
     // 4. Badges Calculation
     const badges: string[] = [];
@@ -98,5 +100,5 @@ export function calculateGamification(attendance: any[], votes: any[], userId: s
     // Snitch (Votes made) - wait, userVotes IS votes made by user
     if (userVotes.length >= 100) badges.push('🕵️ Sherlock');
 
-    return { streak, level, xp, badges };
+    return { streak, level, xp, nextLevelXp, badges };
 }
