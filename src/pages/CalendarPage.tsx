@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Palmtree, User as UserIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Palmtree } from 'lucide-react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, parseISO, isWithinInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useAuth } from '../components/AuthProvider';
@@ -15,37 +15,37 @@ type Absence = {
 };
 
 export default function CalendarPage() {
-    const { user } = useAuth();
+    const { } = useAuth();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [absences, setAbsences] = useState<Absence[]>([]);
     const [users, setUsers] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    // const [loading, setLoading] = useState(true);
 
     const fetchCalendarData = async () => {
-        setLoading(true);
+        // setLoading(true);
         try {
             const month = currentDate.getMonth() + 1;
             const year = currentDate.getFullYear();
 
             // Fetch users for mapping
             // Ideally we should cache this or have it in context
-            const usersRes = await fetch('/api/dashboard'); // reusing dashboard endpoint to get users? heavy.
+            // const usersRes = await fetch('/api/dashboard'); // reusing dashboard endpoint to get users? heavy.
             // Let's assume we have a way to get users. For now let's reuse dashboard or create /api/users
             // Or just rely on the fact that absences might not have names if we don't join.
             // Let's try to get users from /api/dashboard for now
             const dashRes = await fetch('/api/dashboard');
-            const dashData = await dashRes.json();
+            const dashData = await dashRes.json() as { users: any[] };
             setUsers(dashData.users);
 
             const res = await fetch(`/api/calendar?month=${month}&year=${year}`);
             if (res.ok) {
-                const data = await res.json();
+                const data = await res.json() as { absences: Absence[] };
                 setAbsences(data.absences);
             }
         } catch (e) {
             console.error(e);
         } finally {
-            setLoading(false);
+            // setLoading(false);
         }
     };
 
@@ -113,7 +113,7 @@ export default function CalendarPage() {
 
                 {/* Calendar Grid */}
                 <div className="grid grid-cols-7 auto-rows-fr bg-background/50">
-                    {calendarDays.map((day, dayIdx) => {
+                    {calendarDays.map((day) => {
                         const dayAbsences = getDayAbsences(day);
                         const isCurrentMonth = isSameMonth(day, currentDate);
                         const isToday = isSameDay(day, new Date());

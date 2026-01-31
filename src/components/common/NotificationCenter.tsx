@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Bell, Check, Info, Trophy, X } from 'lucide-react';
+import { Bell, Check, Info, Trophy } from 'lucide-react';
 import { useAuth } from '../AuthProvider';
 
 type Notification = {
