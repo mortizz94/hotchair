@@ -9,10 +9,22 @@ import { ACTIVITIES } from '../constants';
 export default function Dashboard() {
     const { user, logout: handleLogout, deleteAccount } = useAuth();
     const navigate = useNavigate();
-    const { dashboardQuery } = useDashboard();
+    const { dashboardQuery, checkInMutation } = useDashboard();
 
     const { data, isLoading } = dashboardQuery;
-    // const { mutate: checkIn } = checkInMutation; // Unused
+    const { mutate: checkIn } = checkInMutation;
+
+    const handleTimerStart = () => {
+        if (user) {
+            checkIn({ userId: user.id, isPresent: true, location: 'office' });
+        }
+    };
+
+    const handleTimerStop = () => {
+        if (user) {
+            checkIn({ userId: user.id, isPresent: false, location: 'office' });
+        }
+    };
 
     // Derived State
     const isPresent = data?.currentUser?.status === 'present';
@@ -125,8 +137,8 @@ export default function Dashboard() {
                     <div className="h-64">
                         <TimeTrackerWidget
                             totalMinutesToday={data?.currentUser?.totalMinutesToday}
-                            onTimerStart={() => dashboardQuery.refetch()}
-                            onTimerStop={() => dashboardQuery.refetch()}
+                            onTimerStart={handleTimerStart}
+                            onTimerStop={handleTimerStop}
                         />
                     </div>
 
