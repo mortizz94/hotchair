@@ -3,6 +3,7 @@ import { Palmtree, LogOut, Trash2, Flame } from 'lucide-react';
 import { useAuth } from '../components/AuthProvider';
 import { useDashboard } from '../hooks/useDashboard';
 import { MoodCard } from '../components/dashboard/MoodCard';
+import { TimeTrackerWidget } from '../components/dashboard/TimeTrackerWidget';
 import { ACTIVITIES } from '../constants';
 
 export default function Dashboard() {
@@ -119,6 +120,16 @@ export default function Dashboard() {
 
                 {/* Right Column: Time Tracker (Span 4) */}
                 <div className="lg:col-span-4 flex flex-col gap-6">
+
+                    {/* Time Tracker Widget */}
+                    <div className="h-64">
+                        <TimeTrackerWidget
+                            totalMinutesToday={data?.currentUser?.totalMinutesToday}
+                            onTimerStart={() => dashboardQuery.refetch()}
+                            onTimerStop={() => dashboardQuery.refetch()}
+                        />
+                    </div>
+
                     {/* Quick Profile / Actions */}
                     <div className="bg-card rounded-[2rem] p-6 border border-border/50 shadow-sm relative overflow-hidden">
                         <h3 className="text-lg font-bold mb-4">Perfil</h3>
